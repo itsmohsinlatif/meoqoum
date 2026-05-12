@@ -49,6 +49,36 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ article: data });
 }
 
+export async function PATCH(req: NextRequest) {
+  const user = await verifyAdmin(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json();
+  const admin = getAdmin();
+  const { id, ...fields } = body;
+
+  const { data, error } = await admin.from('articles').update({
+    title_en:     fields.title_en,
+    title_ur:     fields.title_ur,
+    title_mew:    fields.title_mew,
+    excerpt_en:   fields.excerpt_en,
+    excerpt_ur:   fields.excerpt_ur,
+    excerpt_mew:  fields.excerpt_mew,
+    body_en:      fields.body_en,
+    body_ur:      fields.body_ur,
+    body_mew:     fields.body_mew,
+    category:     fields.category,
+    author:       fields.author,
+    read_min:     fields.read_min ? Number(fields.read_min) : null,
+    cover_id:     fields.cover_id || null,
+    is_pinned:    fields.is_pinned,
+    is_published: fields.is_published,
+  }).eq('id', id).select().single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ article: data });
+}
+
 export async function DELETE(req: NextRequest) {
   const user = await verifyAdmin(req);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

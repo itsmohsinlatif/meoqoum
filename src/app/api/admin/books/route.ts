@@ -48,6 +48,35 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ book: data });
 }
 
+export async function PATCH(req: NextRequest) {
+  const user = await verifyAdmin(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json();
+  const admin = getAdmin();
+  const { id, ...fields } = body;
+
+  const { data, error } = await admin.from('books').update({
+    title_en:        fields.title_en,
+    title_ur:        fields.title_ur,
+    title_mew:       fields.title_mew,
+    author:          fields.author,
+    year:            fields.year ? Number(fields.year) : null,
+    language:        fields.language,
+    category:        fields.category,
+    description_en:  fields.description_en,
+    description_ur:  fields.description_ur,
+    description_mew: fields.description_mew,
+    cover_id:        fields.cover_id || null,
+    source_type:     fields.source_type,
+    source_id:       fields.source_id,
+    is_published:    fields.is_published,
+  }).eq('id', id).select().single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ book: data });
+}
+
 export async function DELETE(req: NextRequest) {
   const user = await verifyAdmin(req);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

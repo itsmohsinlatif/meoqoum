@@ -25,9 +25,33 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    /* Try raw/upload first, then image/upload as fallback for Cloudinary PDFs */
     const upstream = await fetch(url.toString(), { headers: { 'User-Agent': 'MeoQoum/1.0' } });
+
+    if (upstream.status === 401 || upstream.status === 403) {
+      /* Cloudinary private resource — try swapping resource type in URL */
+      const fallbackUrl = url.toString()
+        .replace('/raw/upload/', '/image/upload/')
+        .replace('/image/upload/', '/raw/upload/');  /* swap back if already image */
+      const fallback = await fetch(fallbackUrl, { headers: { 'User-Agent': 'MeoQoum/1.0' } });
+      if (fallback.ok) {
+        const body = await fallback.arrayBuffer();
+        return new NextResponse(body, {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'inline',
+            'Cache-Control': 'public, max-age=86400',
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+      return NextResponse.json({
+        error: 'The file is not publicly accessible on Cloudinary. Go to Cloudinary Dashboard → Media Library → find the file → Resource type should be "Raw" and Access mode should be "Public". Or re-upload the file.',
+      }, { status: 403 });
+    }
+
     if (!upstream.ok) {
-      return NextResponse.json({ error: `Upstream ${upstream.status}` }, { status: 502 });
+      return NextResponse.json({ error: `File not found on Cloudinary (${upstream.status}). It may have been deleted or the URL is incorrect.` }, { status: 502 });
     }
 
     const body = await upstream.arrayBuffer();

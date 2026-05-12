@@ -9,24 +9,48 @@ import { uploadToCloudinary, uploadDocToCloudinary } from '@/lib/cloudinary-uplo
 import type { Locale } from '@/data/content';
 
 /* ── Types ───────────────────────────────────────────────── */
-type Tab = 'books' | 'articles';
+type Tab = 'books' | 'articles' | 'users' | 'degrees';
 type LangTab = 'en' | 'ur' | 'mew';
 
 type DbBook = {
   id: string; slug: string;
-  title_en: string; title_ur: string;
+  title_en: string; title_ur: string; title_mew: string;
   author: string; year: number | null;
-  category: string; source_type: string;
+  category: string; source_type: string; source_id: string;
+  language: string[];
+  description_en: string; description_ur: string; description_mew: string;
+  cover_id: string | null; cover_gradient: string;
   is_published: boolean; created_at: string;
-  cover_id: string | null;
 };
 
 type DbArticle = {
   id: string; slug: string;
-  title_en: string; title_ur: string;
-  author: string; category: string;
+  title_en: string; title_ur: string; title_mew: string;
+  excerpt_en: string; excerpt_ur: string; excerpt_mew: string;
+  body_en: string; body_ur: string; body_mew: string;
+  author: string; category: string; read_min: number | null;
   is_pinned: boolean; is_published: boolean;
   published_at: string; cover_id: string | null;
+};
+
+type DbUser = {
+  id: string; first_name: string; last_name: string;
+  gender: string; country: string | null; city: string | null;
+  is_verified: boolean; is_active: boolean; created_at: string;
+  email: string | null;
+  marriage_profiles: Array<{
+    id: string; degree_doc_id: string | null; degree_type: string | null;
+    is_degree_verified: boolean; degree_status: string; degree_note: string | null;
+    is_active: boolean;
+  }>;
+};
+
+type DbDegree = {
+  id: string; user_id: string;
+  degree_doc_id: string; degree_type: string | null;
+  is_degree_verified: boolean; degree_status: string; degree_note: string | null;
+  created_at: string; email: string | null;
+  profiles: { first_name: string; last_name: string; country: string | null; gender: string } | null;
 };
 
 /* ── Palette ─────────────────────────────────────────────── */
@@ -603,12 +627,15 @@ export default function AdminPage({
   const locale = rawLocale as Locale;
   const router = useRouter();
 
-  const [tab, setTab]       = useState<Tab>('books');
-  const [token, setToken]   = useState('');
+  const [tab, setTab]         = useState<Tab>('books');
+  const [token, setToken]     = useState('');
   const [checking, setChecking] = useState(true);
-  const [books, setBooks]   = useState<DbBook[]>([]);
+  const [books,    setBooks]    = useState<DbBook[]>([]);
   const [articles, setArticles] = useState<DbArticle[]>([]);
+  const [users,    setUsers]    = useState<DbUser[]>([]);
+  const [degrees,  setDegrees]  = useState<DbDegree[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editItem, setEditItem] = useState<DbBook | DbArticle | null>(null);
 
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -641,7 +668,23 @@ export default function AdminPage({
     if (d.articles) setArticles(d.articles);
   }, [token]);
 
-  useEffect(() => { if (token) { loadBooks(); loadArticles(); } }, [token, loadBooks, loadArticles]);
+  const loadUsers = useCallback(async () => {
+    if (!token) return;
+    const res = await fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+    const d = await res.json();
+    if (d.users) setUsers(d.users);
+  }, [token]);
+
+  const loadDegrees = useCallback(async () => {
+    if (!token) return;
+    const res = await fetch('/api/admin/degrees', { headers: { Authorization: `Bearer ${token}` } });
+    const d = await res.json();
+    if (d.degrees) setDegrees(d.degrees);
+  }, [token]);
+
+  useEffect(() => {
+    if (token) { loadBooks(); loadArticles(); loadUsers(); loadDegrees(); }
+  }, [token, loadBooks, loadArticles, loadUsers, loadDegrees]);
 
   if (checking) {
     return (
@@ -678,6 +721,8 @@ export default function AdminPage({
           {([
             { key: 'books',    label: '📚  Books',    count: books.length },
             { key: 'articles', label: '📰  Articles', count: articles.length },
+            { key: 'users',    label: '👥  Members',  count: users.length },
+            { key: 'degrees',  label: '🎓  Degrees',  count: degrees.filter(d => d.degree_status === 'pending').length },
           ] as { key: Tab; label: string; count: number }[]).map(item => (
             <button key={item.key} onClick={() => { setTab(item.key); setShowForm(false); }}
               style={{
@@ -703,11 +748,13 @@ export default function AdminPage({
           {/* Header row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: A.text }}>
-              {tab === 'books' ? '📚 Books' : '📰 Articles'}
+              {tab === 'books' ? '📚 Books' : tab === 'articles' ? '📰 Articles' : tab === 'users' ? '👥 Members' : '🎓 Degree Verification'}
             </h2>
-            <Btn onClick={() => setShowForm(v => !v)}>
-              {showForm ? '✕ Close Form' : `+ Add ${tab === 'books' ? 'Book' : 'Article'}`}
-            </Btn>
+            {(tab === 'books' || tab === 'articles') && (
+              <Btn onClick={() => setShowForm(v => !v)}>
+                {showForm ? '✕ Close Form' : `+ Add ${tab === 'books' ? 'Book' : 'Article'}`}
+              </Btn>
+            )}
           </div>
 
           {/* Upload form */}
@@ -745,6 +792,109 @@ export default function AdminPage({
                       {books.map(b => <BookRow key={b.id} book={b} token={token} onDelete={loadBooks} />)}
                     </tbody>
                   </table>
+                )
+            ) : tab === 'users' ? (
+              users.length === 0
+                ? <p style={{ padding: 32, color: A.mute, textAlign: 'center', fontSize: 13 }}>No members yet.</p>
+                : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#13172050', borderBottom: `1px solid ${A.border}` }}>
+                        {['Member', 'Email', 'Location', 'Joined', 'Verified', 'Rishta', ''].map(h => (
+                          <th key={h} style={{ padding: '8px 12px', fontSize: 10, fontWeight: 700, color: A.mute, textAlign: 'start', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map(u => (
+                        <tr key={u.id} style={{ borderBottom: `1px solid ${A.border}` }}>
+                          <td style={{ padding: '10px 12px', color: A.text, fontSize: 13, fontWeight: 600 }}>
+                            {u.first_name} {u.last_name}
+                            <div style={{ fontSize: 10, color: A.mute, marginTop: 2 }}>{u.gender}</div>
+                          </td>
+                          <td style={{ padding: '10px 12px', color: A.mute, fontSize: 11 }}>{u.email ?? '—'}</td>
+                          <td style={{ padding: '10px 12px', color: A.mute, fontSize: 12 }}>{[u.city, u.country].filter(Boolean).join(', ') || '—'}</td>
+                          <td style={{ padding: '10px 12px', color: A.mute, fontSize: 11 }}>{new Date(u.created_at).toLocaleDateString()}</td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: 10, background: u.is_verified ? `${A.accent}20` : `${A.danger}20`, color: u.is_verified ? A.accent : A.danger, fontSize: 11 }}>
+                              {u.is_verified ? '✓ Yes' : 'No'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px' }}>
+                            {u.marriage_profiles?.[0] ? (
+                              <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 11, background: u.marriage_profiles[0].is_active ? `${A.accent}15` : `${A.border}`, color: u.marriage_profiles[0].is_active ? A.accent : A.mute }}>
+                                {u.marriage_profiles[0].is_active ? 'Active' : 'Hidden'}
+                              </span>
+                            ) : <span style={{ color: A.mute, fontSize: 11 }}>None</span>}
+                          </td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <Btn variant={u.is_verified ? 'ghost' : 'primary'} style={{ padding: '5px 12px', fontSize: 11 }}
+                              onClick={async () => {
+                                await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'toggle_verified', profile_id: u.id, value: !u.is_verified }) });
+                                loadUsers();
+                              }}>
+                              {u.is_verified ? 'Unverify' : 'Verify'}
+                            </Btn>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )
+            ) : tab === 'degrees' ? (
+              degrees.length === 0
+                ? <p style={{ padding: 32, color: A.mute, textAlign: 'center', fontSize: 13 }}>No degree submissions yet.</p>
+                : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 20 }}>
+                    {degrees.map(d => (
+                      <div key={d.id} style={{ background: A.bg, border: `1px solid ${d.degree_status === 'verified' ? A.accent + '44' : d.degree_status === 'amendment_requested' ? A.danger + '44' : A.border}`, borderRadius: 6, padding: 16 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, color: A.text, fontSize: 14 }}>
+                              {d.profiles?.first_name} {d.profiles?.last_name}
+                              <span style={{ fontSize: 11, color: A.mute, marginInlineStart: 8 }}>{d.profiles?.gender} · {d.profiles?.country ?? '—'}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: A.mute, marginTop: 2 }}>{d.email}</div>
+                            <div style={{ marginTop: 8, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                              <span style={{ padding: '3px 10px', borderRadius: 10, fontSize: 11, fontWeight: 700, background: d.degree_status === 'verified' ? `${A.accent}22` : d.degree_status === 'amendment_requested' ? `${A.danger}22` : `${A.gold}22`, color: d.degree_status === 'verified' ? A.accent : d.degree_status === 'amendment_requested' ? A.danger : A.gold }}>
+                                {d.degree_status === 'verified' ? '✓ Verified' : d.degree_status === 'amendment_requested' ? '⚠ Amendment Requested' : '⏳ Pending'}
+                              </span>
+                              <span style={{ fontSize: 12, color: A.mute }}>{d.degree_type ?? 'Unknown type'}</span>
+                            </div>
+                            {d.degree_note && (
+                              <div style={{ marginTop: 8, fontSize: 12, color: A.mute, background: '#0f1117', padding: '6px 10px', borderRadius: 4 }}>
+                                Admin note: {d.degree_note}
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <a href={`/api/pdf?url=https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${d.degree_doc_id}`}
+                              target="_blank" rel="noopener noreferrer"
+                              style={{ padding: '7px 14px', background: A.panel, border: `1px solid ${A.border}`, color: A.mute, fontSize: 12, textDecoration: 'none', borderRadius: 4 }}>
+                              📄 View PDF
+                            </a>
+                            {d.degree_status !== 'verified' && (
+                              <Btn style={{ padding: '7px 14px', fontSize: 12 }}
+                                onClick={async () => {
+                                  await fetch('/api/admin/degrees', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'verify', id: d.id }) });
+                                  loadDegrees();
+                                }}>
+                                ✓ Verify
+                              </Btn>
+                            )}
+                            <Btn variant="danger" style={{ padding: '7px 14px', fontSize: 12 }}
+                              onClick={async () => {
+                                const note = prompt('Amendment message to user:') ?? 'Please re-upload a clearer document.';
+                                await fetch('/api/admin/degrees', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'amend', id: d.id, note }) });
+                                loadDegrees();
+                              }}>
+                              ⚠ Request Amendment
+                            </Btn>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )
             ) : (
               articles.length === 0

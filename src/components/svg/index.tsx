@@ -50,21 +50,32 @@ export const RajputBorder = ({ height = 22, color = '#D4AF37', bg = '#004225' })
   </svg>
 );
 
+/* Mewati Safa (turban) — the traditional white pagri of the Meo community.
+   Layered arcs represent the wound fabric; the tail hangs on the right. */
 export const BrandMark = ({ size = 44 }) => (
   <svg viewBox="0 0 64 64" width={size} height={size}>
+    {/* Background circle */}
     <circle cx="32" cy="32" r="30" fill="#004225" stroke="#D4AF37" strokeWidth="1.5"/>
-    <g transform="translate(32,32)">
-      <polygon points="0,-22 15.5,-15.5 22,0 15.5,15.5 0,22 -15.5,15.5 -22,0 -15.5,-15.5"
-        fill="#D4AF37"/>
-      <polygon points="0,-22 15.5,-15.5 22,0 15.5,15.5 0,22 -15.5,15.5 -22,0 -15.5,-15.5"
-        transform="rotate(22.5)"
-        fill="none" stroke="#F5F5DC" strokeWidth="1"/>
-      <circle r="7" fill="#003319"/>
-      <text y="3" textAnchor="middle" fontSize="9"
-        fontFamily="Cormorant Garamond, serif" fontWeight="600" fill="#D4AF37">
-        م ق
-      </text>
-    </g>
+
+    {/* Turban dome — uppermost part of the safa */}
+    <ellipse cx="32" cy="22" rx="14" ry="8" fill="#D4AF37"/>
+
+    {/* Wound fabric layers — each arc is one wrap of the safa */}
+    <path d="M 16 28 Q 32 23 48 28" stroke="#D4AF37" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+    <path d="M 17 33 Q 32 28 47 33" stroke="#F5F5DC" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M 18 37.5 Q 32 33 46 37.5" stroke="#D4AF37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
+    {/* Rim band at base of turban */}
+    <path d="M 17 41 Q 32 38 47 41" stroke="#c9a430" strokeWidth="2" fill="none" strokeLinecap="round"/>
+
+    {/* Hanging tail — pallu of the safa draped on the right */}
+    <path d="M 47 31 Q 54 38 51 48" stroke="#D4AF37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+
+    {/* Urdu م ق centred on the turban dome */}
+    <text x="32" y="26" textAnchor="middle" fontSize="8"
+      fontFamily="Noto Nastaliq Urdu, serif" fontWeight="700" fill="#004225">
+      م ق
+    </text>
   </svg>
 );
 
