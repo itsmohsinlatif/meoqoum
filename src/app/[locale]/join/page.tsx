@@ -163,7 +163,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
       /* 1. Upload profile picture if selected */
       let uploadedPicId = picId;
       if (picFile && !uploadedPicId) {
-        const result = await uploadToCloudinary(picFile, 'meopehchan/profiles');
+        const result = await uploadToCloudinary(picFile, 'meoqoum/profiles');
         uploadedPicId = result.publicId;
         setPicId(uploadedPicId);
       }
@@ -359,7 +359,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
                 <select style={{ ...SEL, fontFamily: ff }} value={f.gotraId}
                   onChange={e => set('gotraId', e.target.value)}
                   disabled={!f.palId}>
-                  <option value="">{f.palId ? d.selectOption[locale] : (locale === 'en' ? 'Select Pal first' : 'پہلے پال چنیں')}</option>
+                  <option value="">{f.palId ? d.selectOption[locale] : (locale === 'en' ? 'Select Pal first' : locale === 'ur' ? 'پہلے پال چنیں' : 'پہلاں پال چُنو')}</option>
                   {palGotras.map((g, i) => (
                     <option key={i} value={String(i + 1)}>{g.name} — {g.urdu}</option>
                   ))}
@@ -367,7 +367,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
               </Field>
               <Field label={d.village[locale]} full>
                 <input style={{ ...INP, fontFamily: ff }} value={f.village}
-                  placeholder={locale === 'en' ? 'e.g. Nuh, Alwar, Bharatpur…' : 'مثلاً نوح، الور، بھرتپور…'}
+                  placeholder={locale === 'en' ? 'e.g. Nuh, Alwar, Bharatpur…' : locale === 'ur' ? 'مثلاً نوح، الور، بھرتپور…' : 'مثلاً نوح، الور، بھرتپور…'}
                   onChange={e => set('village', e.target.value)} />
               </Field>
             </Section>
@@ -386,7 +386,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
               </Field>
               <Field label={d.eduField[locale]}>
                 <input style={{ ...INP, fontFamily: ff }} value={f.educationField}
-                  placeholder={locale === 'en' ? 'e.g. Computer Science, Medicine…' : 'مثلاً کمپیوٹر سائنس، طب…'}
+                  placeholder={locale === 'en' ? 'e.g. Computer Science, Medicine…' : locale === 'ur' ? 'مثلاً کمپیوٹر سائنس، طب…' : 'مثلاً کمپیوٹر سائنس، طب…'}
                   onChange={e => set('educationField', e.target.value)} />
               </Field>
               <Field label={d.profession[locale]}>
@@ -402,7 +402,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
             <Section title={d.s4[locale]} ff={ff}>
               <Field label={d.cnic[locale]} required>
                 <input style={{ ...INP, fontFamily: ff }} value={f.cnic}
-                  placeholder={locale === 'en' ? 'e.g. 35201-1234567-1 or Passport No.' : 'شناختی کارڈ یا پاسپورٹ نمبر'}
+                  placeholder={locale === 'en' ? 'e.g. 35201-1234567-1 or Passport No.' : locale === 'ur' ? 'شناختی کارڈ یا پاسپورٹ نمبر' : 'شناختی کارڈ یا پاسپورٹ نمبر'}
                   onChange={e => set('cnic', e.target.value)} />
                 {errors.cnic && <Err msg={errors.cnic} />}
               </Field>
@@ -506,7 +506,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
                     {d.uploadPic[locale]}
                   </button>
                   <p style={{ fontFamily: ff, fontSize: 11, color: 'var(--ink-mute)', marginTop: 8 }}>
-                    {locale === 'en' ? 'JPG/PNG, max 5 MB' : 'JPG/PNG، زیادہ سے زیادہ 5 MB'}
+                    {locale === 'en' ? 'JPG/PNG, max 5 MB' : locale === 'ur' ? 'JPG/PNG، زیادہ سے زیادہ 5 MB' : 'JPG/PNG، زیادہ سے زیادہ 5 MB'}
                   </p>
                   <input ref={picInputRef} type="file" accept="image/*"
                     onChange={handlePic} style={{ display: 'none' }} />
@@ -534,7 +534,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
                 letterSpacing: '0.06em', textTransform: 'uppercase',
                 opacity: loading ? 0.7 : 1,
               }}>
-                {loading ? (locale === 'en' ? 'Creating…' : 'بنا رہے ہیں…') : d.submitBtn[locale]}
+                {loading ? (locale === 'en' ? 'Creating…' : locale === 'ur' ? 'بنا رہے ہیں…' : 'بنا راں ہاں…') : d.submitBtn[locale]}
               </button>
               <p style={{ fontFamily: ff, fontSize: 14, color: 'var(--ink-soft)' }}>
                 {d.alreadyMember[locale]}{' '}

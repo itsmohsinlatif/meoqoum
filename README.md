@@ -1,4 +1,4 @@
-# Meo Pehchan — میو پہچان
+# Meo Qoum — میو قوم
 
 A multilingual community website for the Meo people of Mewat. Built with Next.js 16 App Router, it serves as a living digital archive of gotras, history, language, and culture — available in **English**, **Urdu**, and **Mewati** (Pakistani dialect, Urdu Nastaliq script).
 
@@ -72,7 +72,7 @@ Mewati strings are kept **strictly separate** from Urdu. Key dialect markers pre
 ## Project structure
 
 ```
-meopehchan/
+meoqoum/
 ├── messages/
 │   ├── en.json           # Minimal (routing only; content lives in content.ts)
 │   ├── ur.json

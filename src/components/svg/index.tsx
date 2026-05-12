@@ -1,4 +1,4 @@
-/* Meo Pehchan — SVG ornaments */
+/* Meo Qoum — SVG ornaments */
 
 export const StarKhatim = ({ size = 44, color = '#D4AF37', stroke = '#004225' }) => (
   <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
@@ -62,7 +62,7 @@ export const BrandMark = ({ size = 44 }) => (
       <circle r="7" fill="#003319"/>
       <text y="3" textAnchor="middle" fontSize="9"
         fontFamily="Cormorant Garamond, serif" fontWeight="600" fill="#D4AF37">
-        م پ
+        م ق
       </text>
     </g>
   </svg>

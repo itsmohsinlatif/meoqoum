@@ -3,9 +3,9 @@ type L = { en: string; ur: string; mew: string };
 
 /* Brand */
 export const BRAND = {
-  en: { name: 'Meo Pehchan', tag: 'Heritage of the Meo people' },
-  ur: { name: 'میو پہچان', tag: 'میو قوم کی پہچان و وراثت' },
-  mew: { name: 'میو پہچان', tag: 'میو قوم کی نج، ہمارو ورسو' },
+  en: { name: 'Meo Qoum', tag: 'Heritage of the Meo people' },
+  ur: { name: 'میو قوم', tag: 'میو قوم کی پہچان و وراثت' },
+  mew: { name: 'میو قوم', tag: 'میو قوم کی نج، ہمارو ورسو' },
 };
 
 /* Navigation */
@@ -27,9 +27,9 @@ export const HOME = {
     mew: ['دھرتی کا بیٹا،', 'سات صدیاں کی یاد۔'],
   },
   sub: {
-    en: 'Meo Pehchan is a living archive of the Meo community of Mewat — our gotras, our histories, our mother tongue, and the families who carry them forward across India, Pakistan, and the diaspora.',
-    ur: 'میو پہچان میوات کے میو سماج کا ایک زندہ آرکائیو ہے — ہماری گوتریں، ہماری تاریخ، ہماری ماں بولی، اور وہ خاندان جو اسے ہندوستان، پاکستان اور بیرونِ ملک آگے بڑھاتے ہیں۔',
-    mew: 'میو پہچان میوات کا میو لوگاں کو جیتو جاگتو خزانو ہے — ہماری گوتراں، ہماری تواریخ، ہماری ماں بولی، اور وے گھر جو ہندوستان، پاکستان اور باہر کے دیساں میں اے سب کوں آگے لے کے چلے ہیں۔',
+    en: 'Meo Qoum is a living archive of the Meo community of Mewat — our gotras, our histories, our mother tongue, and the families who carry them forward across India, Pakistan, and the diaspora.',
+    ur: 'میو قوم میوات کے میو سماج کا ایک زندہ آرکائیو ہے — ہماری گوتریں، ہماری تاریخ، ہماری ماں بولی، اور وہ خاندان جو اسے ہندوستان، پاکستان اور بیرونِ ملک آگے بڑھاتے ہیں۔',
+    mew: 'میو قوم میوات کا میو لوگاں کو جیتو جاگتو خزانو ہے — ہماری گوتراں، ہماری تواریخ، ہماری ماں بولی، اور وے گھر جو ہندوستان، پاکستان اور باہر کے دیساں میں اے سب کوں آگے لے کے چلے ہیں۔',
   } as L,
   ctaPrimary:   { en: 'Explore the Timeline', ur: 'تاریخی سفر دیکھیں', mew: 'تواریخ کی سیر کرو' } as L,
   ctaSecondary: { en: 'Find your Gotra',      ur: 'اپنی گوتر تلاش کریں', mew: 'اپنی گوتر ڈھونڈو' } as L,
@@ -154,9 +154,9 @@ export const HISTORY = {
       year: 'Today',
       t: { en: 'A digital Pehchan', ur: 'ڈیجیٹل پہچان', mew: 'ڈیجیٹل پچھان' } as L,
       d: {
-        en: 'Meo Pehchan goes online — a community-edited archive of gotras, families, voices, and the everyday life of Mewat across borders.',
-        ur: 'میو پہچان آن لائن — گوتروں، خاندانوں، آوازوں، اور سرحدوں کے پار میواتی روزمرہ کا ایک کمیونٹی آرکائیو۔',
-        mew: 'میو پہچان آن لائن — گوتراں، گھراں، آوازاں، اور سرحداں کے پار میواتی روزمرہ کو سماج کا اپنو خزانو۔',
+        en: 'Meo Qoum goes online — a community-edited archive of gotras, families, voices, and the everyday life of Mewat across borders.',
+        ur: 'میو قوم آن لائن — گوتروں، خاندانوں، آوازوں، اور سرحدوں کے پار میواتی روزمرہ کا ایک کمیونٹی آرکائیو۔',
+        mew: 'میو قوم آن لائن — گوتراں، گھراں، آوازاں، اور سرحداں کے پار میواتی روزمرہ کو سماج کا اپنو خزانو۔',
       } as L,
     },
   ],
@@ -309,7 +309,7 @@ export const LIBRARY = {
 /* JOIN — member registration */
 export const JOIN = {
   eyebrow: { en: 'Become a Member',       ur: 'ممبر بنیں',         mew: 'ممبر بنو'         } as L,
-  title:   { en: 'Join Meo Pehchan',      ur: 'میو پہچان سے جڑیں', mew: 'میو پہچان سوں جڑو'} as L,
+  title:   { en: 'Join Meo Qoum',      ur: 'میو قوم سے جڑیں', mew: 'میو قوم سوں جڑو'} as L,
   sub: {
     en: 'Create your community profile — find your gotra relatives, access the Rishta directory, and help preserve Meo heritage.',
     ur: 'اپنی کمیونٹی پروفائل بنائیں — گوتر رشتہ داروں کو تلاش کریں، رشتہ ڈائریکٹری تک رسائی پائیں، اور میو ورثے کو محفوظ رکھنے میں مدد کریں۔',
@@ -353,7 +353,7 @@ export const JOIN = {
   submitBtn:     { en: 'Create My Account',   ur: 'میرا اکاؤنٹ بنائیں',     mew: 'میرو اکاؤنٹ بناؤ'     } as L,
   alreadyMember: { en: 'Already a member?',   ur: 'پہلے سے ممبر ہیں؟',      mew: 'پہلاں سے ممبر ہو؟'    } as L,
   loginLink:     { en: 'Log in',              ur: 'لاگ ان کریں',            mew: 'لاگ ان کرو'           } as L,
-  successTitle:  { en: 'Welcome to Meo Pehchan!', ur: 'میو پہچان میں خوش آمدید!', mew: 'میو پہچان میں خوش آمدید!' } as L,
+  successTitle:  { en: 'Welcome to Meo Qoum!', ur: 'میو قوم میں خوش آمدید!', mew: 'میو قوم میں خوش آمدید!' } as L,
   successSub: {
     en: 'Your account has been created. Check your email to verify, then log in.',
     ur: 'آپ کا اکاؤنٹ بن گیا ہے۔ ای میل چیک کریں اور پھر لاگ ان کریں۔',
@@ -407,15 +407,15 @@ export const RISHTA = {
 /* FOOTER */
 export const FOOTER = {
   about: {
-    en: 'Meo Pehchan is an open community archive maintained by volunteer editors across Mewat, Karachi, Lahore, and the Gulf. Contributions in any of our three languages are welcome.',
-    ur: 'میو پہچان ایک کھلا کمیونٹی آرکائیو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار مرتب کرتے ہیں۔ ہماری تینوں زبانوں میں شراکت کا خیر مقدم ہے۔',
-    mew: 'میو پہچان ایک کھلو سماج کو خزانو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار سنبھالاں ہاں۔ ہماری تیناں بولیاں میں حصہ ڈالنو خوش آمدید۔',
+    en: 'Meo Qoum is an open community archive maintained by volunteer editors across Mewat, Karachi, Lahore, and the Gulf. Contributions in any of our three languages are welcome.',
+    ur: 'میو قوم ایک کھلا کمیونٹی آرکائیو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار مرتب کرتے ہیں۔ ہماری تینوں زبانوں میں شراکت کا خیر مقدم ہے۔',
+    mew: 'میو قوم ایک کھلو سماج کو خزانو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار سنبھالاں ہاں۔ ہماری تیناں بولیاں میں حصہ ڈالنو خوش آمدید۔',
   } as L,
   explore:    { en: 'Explore',    ur: 'دیکھیں',    mew: 'دیکھو' } as L,
   contribute: { en: 'Contribute', ur: 'حصہ ڈالیں', mew: 'حصہ ڈالو' } as L,
   contact:    { en: 'Contact',    ur: 'رابطہ',      mew: 'رابطہ' } as L,
   contactItems: [
-    { en: 'editors@meopehchan.org', ur: 'editors@meopehchan.org', mew: 'editors@meopehchan.org' } as L,
+    { en: 'editors@meoqoum.com', ur: 'editors@meoqoum.com', mew: 'editors@meoqoum.com' } as L,
     { en: 'Nuh, Haryana · India',  ur: 'نوح، ہریانہ · ہندوستان', mew: 'نوح، ہریانہ · ہندوستان' } as L,
     { en: 'Karachi · Pakistan',    ur: 'کراچی · پاکستان',        mew: 'کراچی · پاکستان'       } as L,
   ],
@@ -426,8 +426,8 @@ export const FOOTER = {
     { en: 'Translate an article',   ur: 'مضمون کا ترجمہ کریں', mew: 'لیکھ کو ترجمو کرو'  } as L,
   ],
   rights: {
-    en: '© 2026 Meo Pehchan · Made with care across three borders',
-    ur: '© 2026 میو پہچان · تین سرحدوں کے پار محبت سے بنایا گیا',
-    mew: '© 2026 میو پہچان · تیناں سرحداں کے پار محبت سوں بنایو',
+    en: '© 2026 Meo Qoum · Made with care across three borders',
+    ur: '© 2026 میو قوم · تین سرحدوں کے پار محبت سے بنایا گیا',
+    mew: '© 2026 میو قوم · تیناں سرحداں کے پار محبت سوں بنایو',
   } as L,
 };

@@ -62,7 +62,7 @@ export default function Header({ active }: HeaderProps) {
             style={{ fontFamily: locale === 'en' ? 'var(--serif)' : 'var(--urdu)' }}
           >
             {brand.name}
-            {locale === 'en' && <span className="urdu">میو پہچان</span>}
+            {locale === 'en' && <span className="urdu">میو قوم</span>}
           </div>
         </Link>
 

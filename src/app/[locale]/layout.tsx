@@ -32,8 +32,8 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: 'Meo Pehchan — Heritage of the Meo People',
-  description: 'A living digital archive of the Meo community of Mewat — gotras, histories, mother tongue, and families.',
+  title: 'Meo Qoum — میو قوم',
+  description: 'The digital home of the Meo community — gotras, histories, Mewati language, Rishta directory, and family archive across Mewat, Pakistan, and the diaspora.',
 };
 
 export default async function LocaleLayout({

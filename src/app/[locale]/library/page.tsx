@@ -381,7 +381,7 @@ export default function LibraryPage({
             : 'نسخے، گھر کی تواریخ، کتابچے یا آواز کی ریکارڈنگ اپ لوڈ کرو۔ ہمارے مدیر اناں کوں تیناں بولیاں میں مرتب کریں گے۔'}
         </p>
         <a
-          href="mailto:editors@meopehchan.org?subject=Book+Submission"
+          href="mailto:editors@meoqoum.com?subject=Book+Submission"
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             background: 'var(--gold)',

@@ -122,11 +122,11 @@ export default async function HomePage({
                 <circle r="22" fill="#003319"/>
                 <circle r="14" fill="none" stroke="#D4AF37" strokeWidth="1"/>
                 <text y="5" textAnchor="middle" fontFamily="Cormorant Garamond, serif"
-                  fontSize="18" fill="#D4AF37" fontWeight="600">م پ</text>
+                  fontSize="18" fill="#D4AF37" fontWeight="600">م ق</text>
               </g>
               <text x="200" y="400" textAnchor="middle"
                 fontFamily="Noto Nastaliq Urdu, serif" fontSize="22" fill="#D4AF37">
-                میوات کی پہچان
+                میوات کی قوم
               </text>
               <line x1="100" y1="420" x2="300" y2="420" stroke="#D4AF37" strokeWidth="0.5" opacity="0.5"/>
               <text x="200" y="445" textAnchor="middle"

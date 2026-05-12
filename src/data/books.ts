@@ -10,7 +10,7 @@ export interface Book {
   language: ('en' | 'ur' | 'mew')[];
   category: BookCategory;
   description: { en: string; ur: string; mew: string };
-  /** Cloudinary public_id, e.g.  meopehchan/covers/slug
+  /** Cloudinary public_id, e.g.  meoqoum/covers/slug
    *  Upload your cover JPGs at: https://console.cloudinary.com */
   coverId: string | null;
   /** Fallback CSS gradient shown while cover loads or if coverId is null */
@@ -40,7 +40,7 @@ export const BOOKS: Book[] = [
       ur: 'میوات کی جامع اردو تاریخ — ابتدائی راجپوت جڑوں سے لے کر خانزادہ دور، 1857 کی بغاوت، اور 1947 کی ہجرت تک۔',
       mew: 'میوات کی پوری تواریخ — پہلاں کے راجپوت دور سے لے کے خانزادہ، 1857 کی لڑائی اور 1947 کی ہجرت تک۔',
     },
-    coverId: 'meopehchan/covers/tarikh-mewat',
+    coverId: 'meoqoum/covers/tarikh-mewat',
     coverGradient: 'linear-gradient(135deg, #1a3a2a, #004225)',
     source: {
       type: 'archive',
@@ -64,7 +64,7 @@ export const BOOKS: Book[] = [
       ur: 'میو قوم کا نسلیاتی و تاریخی مطالعہ — ان کی مذہبی شناخت، سماجی تنظیم، تبلیغی جماعت سے تعلق، اور تقسیم کے بعد بقاء۔',
       mew: 'میو قوم کی مکمل تاریخ — ان کو مذہب، سماج، تبلیغی جماعت سوں رشتہ، اور تقسیم کے بعد کی زندگی۔',
     },
-    coverId: 'meopehchan/covers/meos-of-mewat',
+    coverId: 'meoqoum/covers/meos-of-mewat',
     coverGradient: 'linear-gradient(135deg, #8a6a20, #5c4410)',
     source: {
       type: 'archive',
@@ -79,7 +79,7 @@ export const BOOKS: Book[] = [
       ur: 'میواتی زبان کی گرامر',
       mew: 'میواتی بولی کی گرامر',
     },
-    author: 'Community Editorial · Meo Pehchan',
+    author: 'Community Editorial · Meo Qoum',
     year: 2024,
     language: ['en', 'ur', 'mew'],
     category: 'language',
@@ -88,11 +88,11 @@ export const BOOKS: Book[] = [
       ur: 'سیکھنے والوں اور بیرونی نسل کے لیے عملی رہنما: صوتیات، رسم الخط، فعل کی گردان، اور میواتی کا اردو سے فرق — تینوں زبانوں میں مثالی جملوں کے ساتھ۔',
       mew: 'سیکھنے والاں اور باہر کے نوجوانوں کے لیے کام کی کتاب: آوازاں، لکھائی، فعل کی گردان، اور میواتی کو اردو سوں فرق — تیناں بولیاں میں مثالاں کے سنگ۔',
     },
-    coverId: 'meopehchan/covers/mewati-grammar',
+    coverId: 'meoqoum/covers/mewati-grammar',
     coverGradient: 'linear-gradient(135deg, #2a4a5a, #1a3040)',
     source: {
       type: 'pdf_url',
-      id: 'https://res.cloudinary.com/demo/raw/upload/meopehchan/books/mewati-grammar.pdf',
+      id: 'https://res.cloudinary.com/demo/raw/upload/meoqoum/books/mewati-grammar.pdf',
     },
   },
   {
@@ -112,7 +112,7 @@ export const BOOKS: Book[] = [
       ur: 'حسن خان میواتی کی مکمل سوانح — خانزادہ حکمران جنہوں نے بابر کے خلاف رانا سانگا کا ساتھ دیا اور کھنوا (1527) میں شہادت پائی۔',
       mew: 'حسن خان میواتی کی پوری سوانح — خانزادہ حکمران جنہوں نے بابر کے خلاف رانا سانگا کو سنگ دیو اور کھنوا (1527) میں شہادت پائی۔',
     },
-    coverId: 'meopehchan/covers/hasan-khan',
+    coverId: 'meoqoum/covers/hasan-khan',
     coverGradient: 'linear-gradient(135deg, #4a1a1a, #2a0a0a)',
     source: {
       type: 'archive',
@@ -136,7 +136,7 @@ export const BOOKS: Book[] = [
       ur: 'میواتی رسم الخط میں قلم بند زبانی روایتی قصوں کا مجموعہ، اردو ترجمے کے ساتھ — لوریاں، بہادروں کی داستانیں، اور بزرگوں کی یاد میں موسمی گیت۔',
       mew: 'میواتی لکھائی میں لکھے ہوئے زبانی قصاں کو مجموعو، اردو ترجمے کے سنگ — لوریاں، بہادراں کی داستاناں، اور بزرگاں کی یاد میں گیت۔',
     },
-    coverId: 'meopehchan/covers/mewati-qisse',
+    coverId: 'meoqoum/covers/mewati-qisse',
     coverGradient: 'linear-gradient(135deg, #3a5a2a, #1a3010)',
     source: {
       type: 'archive',
@@ -160,7 +160,7 @@ export const BOOKS: Book[] = [
       ur: 'گڑگاؤں ضلع کا برطانوی نوآبادیاتی گزیٹیئر — پبلک ڈومین۔ میوات کے حصے گاؤں کی آبادی، گوتر کی تقسیم، زمین کی ملکیت اور مقامی رسم ورواج کی دستاویز ہیں۔',
       mew: 'گڑگاؤں کا برطانوی گزیٹیئر — پبلک ڈومین۔ میواتی حصے گاؤں کی آبادی، گوتر کی تقسیم، زمین اور رسم و رواج کی دستاویز ہاں۔',
     },
-    coverId: 'meopehchan/covers/gurgaon-gazetteer',
+    coverId: 'meoqoum/covers/gurgaon-gazetteer',
     coverGradient: 'linear-gradient(135deg, #6a6a50, #4a4a30)',
     source: {
       type: 'archive',
@@ -184,7 +184,7 @@ export const BOOKS: Book[] = [
       ur: 'مولانا محمد الیاسؒ کی تبلیغی جماعت کا 1920-30 کی دہائی میں میوات میں آغاز، اور میو سماج کی مذہبی و سماجی زندگی پر اس کے اثرات کا علمی جائزہ۔',
       mew: 'مولانا محمد الیاسؒ کی تبلیغی جماعت کو 1920-30 کے دور میں میوات میں شروع ہونو، اور میو سماج کی زندگی پر اس کے اثراں کا جائزو۔',
     },
-    coverId: 'meopehchan/covers/tabligh-meo',
+    coverId: 'meoqoum/covers/tabligh-meo',
     coverGradient: 'linear-gradient(135deg, #2a2a4a, #10102a)',
     source: {
       type: 'archive',
@@ -199,7 +199,7 @@ export const BOOKS: Book[] = [
       ur: 'میواتی کہاوتیں اور محاورے',
       mew: 'میواتی کہاوتاں اور محاورے',
     },
-    author: 'Community Collection · Meo Pehchan',
+    author: 'Community Collection · Meo Qoum',
     year: 2025,
     language: ['mew', 'ur', 'en'],
     category: 'language',
@@ -208,11 +208,11 @@ export const BOOKS: Book[] = [
       ur: '400 سے زائد میواتی کہاوتیں، محاورے اور مقولے — اردو اور انگریزی ترجمے کے ساتھ۔ نوح، الور اور بھرتپور کے بزرگوں سے جمع کیے گئے۔',
       mew: '400 سے زادو میواتی کہاوتاں، محاورے — اردو اور انگریزی ترجمے کے سنگ۔ نوح، الور اور بھرتپور کے بزرگاں سوں اکٹھی کری ہوئی۔',
     },
-    coverId: 'meopehchan/covers/mewati-proverbs',
+    coverId: 'meoqoum/covers/mewati-proverbs',
     coverGradient: 'linear-gradient(135deg, #5a3a1a, #3a2010)',
     source: {
       type: 'pdf_url',
-      id: 'https://res.cloudinary.com/demo/raw/upload/meopehchan/books/mewati-proverbs.pdf',
+      id: 'https://res.cloudinary.com/demo/raw/upload/meoqoum/books/mewati-proverbs.pdf',
     },
   },
 ];

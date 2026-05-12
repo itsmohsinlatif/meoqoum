@@ -5,7 +5,7 @@ export type UploadResult = { publicId: string; url: string };
 
 export async function uploadToCloudinary(
   file: File,
-  folder: string = 'meopehchan'
+  folder: string = 'meoqoum'
 ): Promise<UploadResult> {
   const formData = new FormData();
   formData.append('file', file);
@@ -28,7 +28,7 @@ export async function uploadToCloudinary(
 
 export async function uploadDocToCloudinary(
   file: File,
-  folder: string = 'meopehchan/degrees'
+  folder: string = 'meoqoum/degrees'
 ): Promise<UploadResult> {
   const formData = new FormData();
   formData.append('file', file);

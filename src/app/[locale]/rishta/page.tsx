@@ -99,10 +99,10 @@ function ProfileCard({
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px', flex: 1 }}>
           {[
-            { label: locale === 'en' ? 'Education' : 'تعلیم', value: eduLabel },
-            { label: locale === 'en' ? 'Profession' : 'پیشہ', value: p.profession ?? '—' },
-            { label: locale === 'en' ? 'City' : 'شہر',       value: isLoggedIn ? (p.city ?? '—') : '***' },
-            { label: locale === 'en' ? 'Country' : 'ملک',    value: COUNTRIES.find(c => c.code === p.country)?.name ?? p.country ?? '—' },
+            { label: locale === 'en' ? 'Education' : locale === 'ur' ? 'تعلیم' : 'تعلیم', value: eduLabel },
+            { label: locale === 'en' ? 'Profession' : locale === 'ur' ? 'پیشہ' : 'پیشو',  value: p.profession ?? '—' },
+            { label: locale === 'en' ? 'City' : locale === 'ur' ? 'شہر' : 'شہر',           value: isLoggedIn ? (p.city ?? '—') : '***' },
+            { label: locale === 'en' ? 'Country' : locale === 'ur' ? 'ملک' : 'ملک',        value: COUNTRIES.find(c => c.code === p.country)?.name ?? p.country ?? '—' },
           ].map((item, i) => (
             <div key={i}>
               <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 2 }}>
@@ -135,7 +135,7 @@ function ProfileCard({
           </Link>
         ) : (
           <div style={{ marginTop: 16, fontSize: 12, color: 'var(--ink-mute)', fontFamily: ff, fontStyle: 'italic' }}>
-            {locale === 'en' ? 'Join to view full profile' : 'مکمل پروفائل کے لیے ممبر بنیں'}
+            {locale === 'en' ? 'Join to view full profile' : locale === 'ur' ? 'مکمل پروفائل کے لیے ممبر بنیں' : 'پوری پروفائل کے لیے ممبر بنو'}
           </div>
         )}
       </div>
@@ -324,7 +324,7 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
               paddingBottom: 10, borderBottom: '2px solid var(--gold)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
-              <span>{locale === 'en' ? 'Filters' : 'فلٹر'}</span>
+              <span>{locale === 'en' ? 'Filters' : locale === 'ur' ? 'فلٹر' : 'فلٹر'}</span>
               <button onClick={clearFilters} style={{
                 background: 'transparent', border: 0, cursor: 'pointer',
                 color: 'var(--ink-mute)', fontFamily: ff, fontSize: 11,
@@ -338,8 +338,8 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
               <FilterRow label={d.filterGender[locale]} ff={ff}>
                 <select style={SEL} value={gender} onChange={e => setGender(e.target.value)}>
                   <option value="">{d.anyOption[locale]}</option>
-                  <option value="male">{locale === 'en' ? 'Male' : 'مرد'}</option>
-                  <option value="female">{locale === 'en' ? 'Female' : 'عورت'}</option>
+                  <option value="male">{locale === 'en' ? 'Male' : locale === 'ur' ? 'مرد' : 'مرد'}</option>
+                  <option value="female">{locale === 'en' ? 'Female' : locale === 'ur' ? 'عورت' : 'عورت'}</option>
                 </select>
               </FilterRow>
 
