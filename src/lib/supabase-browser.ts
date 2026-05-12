@@ -36,6 +36,12 @@ export type Profile = {
   city: string | null;
   contact_no: string | null;
   profile_pic_id: string | null;
+  profile_pic_id_2: string | null;
+  social_whatsapp: string | null;
+  social_facebook: string | null;
+  social_instagram: string | null;
+  social_linkedin: string | null;
+  social_twitter: string | null;
   is_verified: boolean;
   is_active: boolean;
   created_at: string;

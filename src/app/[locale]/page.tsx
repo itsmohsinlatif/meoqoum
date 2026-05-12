@@ -6,7 +6,8 @@ import { GeoPattern, StarKhatim, Arrow } from '@/components/svg';
 import { routing } from '@/config/routing';
 import { HOME, type Locale } from '@/data/content';
 import Link from 'next/link';
-import { cldFetch } from '@/lib/cloudinary';
+// Cloudinary demo-cloud sample images (always available, no config needed)
+const DEMO = 'https://res.cloudinary.com/demo/image/upload';
 
 export default async function HomePage({
   params,
@@ -282,11 +283,8 @@ export default async function HomePage({
               color: 'var(--cream)',
             }}>
               <Image
-                src={cldFetch(
-                  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Alwar_City_Palace_facade.jpg/1280px-Alwar_City_Palace_facade.jpg',
-                  { w: 800, q: 'auto' }
-                )}
-                alt="Alwar City Palace, Mewat region"
+                src={`${DEMO}/w_800,q_auto,f_auto/cld-sample-5`}
+                alt="Heritage palace — sample image"
                 fill
                 style={{ objectFit: 'cover' }}
                 sizes="(max-width: 768px) 100vw, 600px"
@@ -324,11 +322,8 @@ export default async function HomePage({
                 title: locale === 'en' ? 'A panchayat record from 1842' :
                        locale === 'ur' ? '1842 کی پنچایت کی بہی' :
                        '1842 کی پنچائت کی بہی',
-                imgSrc: cldFetch(
-                  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Facsimile_of_ancient_manuscript.jpg/800px-Facsimile_of_ancient_manuscript.jpg',
-                  { w: 500, q: 'auto' }
-                ),
-                imgAlt: 'Ancient manuscript',
+                imgSrc: `${DEMO}/w_500,q_auto,f_auto,e_sepia:60/cld-sample-2`,
+                imgAlt: 'Archive manuscript sample',
                 fallbackBg: 'linear-gradient(135deg, #d6c590, #a89060)',
               },
               {
@@ -337,11 +332,8 @@ export default async function HomePage({
                 title: locale === 'en' ? 'Fields of the Aravalli foothills' :
                        locale === 'ur' ? 'اراولی کی تلہٹی کے کھیت' :
                        'اراولی کی تلہٹی کے کھیت',
-                imgSrc: cldFetch(
-                  'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Aravalli_hills_Rajasthan_India.jpg/1280px-Aravalli_hills_Rajasthan_India.jpg',
-                  { w: 500, q: 'auto' }
-                ),
-                imgAlt: 'Aravalli hills, Rajasthan — heartland of Mewat',
+                imgSrc: `${DEMO}/w_500,q_auto,f_auto/cld-sample-4`,
+                imgAlt: 'Landscape sample image',
                 fallbackBg: 'linear-gradient(135deg, #5a7d5d, #2d4a30)',
               },
             ].map((card, i) => (
