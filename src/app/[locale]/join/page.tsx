@@ -82,7 +82,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     firstName: '', lastName: '', fatherName: '', dob: '', gender: '',
     maritalStatus: '', palId: '', gotraId: '', village: '',
     educationLevel: '', educationField: '', profession: '', bloodGroup: '',
-    cnic: '', permAddr: '', currAddr: '',
+    intro: '', permAddr: '', currAddr: '',
     country: '', province: '', city: '',
     email: '', contact: '', password: '', confirmPass: '',
     whatsapp: '', facebook: '', instagram: '', linkedin: '', twitter: '',
@@ -147,7 +147,6 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     if (!f.maritalStatus)    e.maritalStatus = 'Required';
     if (!f.palId)            e.palId     = 'Required';
     if (!f.educationLevel)   e.educationLevel = 'Required';
-    if (!f.cnic.trim())      e.cnic      = 'Required';
     if (!f.permAddr.trim())  e.permAddr  = 'Required';
     if (!f.country)          e.country   = 'Required';
     if (!f.city)             e.city      = 'Required';
@@ -215,7 +214,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
         profession:      f.profession || null,
         blood_group:     f.bloodGroup || null,
         religion:        'Islam',
-        cnic_no:         f.cnic.trim(),
+        intro:           f.intro.trim() || null,
         permanent_addr:  f.permAddr.trim(),
         current_addr:    f.currAddr.trim() || null,
         country:         f.country || null,
@@ -420,11 +419,18 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
 
             {/* ── S4 Location & Contact ── */}
             <Section title={d.s4[locale]} ff={ff}>
-              <Field label={d.cnic[locale]} required>
-                <input style={{ ...INP, fontFamily: ff }} value={f.cnic}
-                  placeholder={locale === 'en' ? 'e.g. 35201-1234567-1 or Passport No.' : locale === 'ur' ? 'شناختی کارڈ یا پاسپورٹ نمبر' : 'شناختی کارڈ یا پاسپورٹ نمبر'}
-                  onChange={e => set('cnic', e.target.value)} />
-                {errors.cnic && <Err msg={errors.cnic} />}
+              <Field label={d.intro[locale]} full>
+                <textarea
+                  rows={3}
+                  maxLength={500}
+                  style={{ ...INP, fontFamily: ff, resize: 'vertical', direction: dir as 'ltr'|'rtl' }}
+                  value={f.intro}
+                  placeholder={d.introHint[locale]}
+                  onChange={e => set('intro', e.target.value)}
+                />
+                <span style={{ fontSize: 11, color: 'var(--ink-mute)', fontFamily: ff }}>
+                  {f.intro.length} / 500
+                </span>
               </Field>
               <Field label={d.country[locale]} required>
                 <select style={{ ...SEL, fontFamily: ff }} value={f.country}

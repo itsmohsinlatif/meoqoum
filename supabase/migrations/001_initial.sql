@@ -52,8 +52,10 @@ CREATE TABLE IF NOT EXISTS profiles (
   education_field  text,
   profession       text,
 
+  -- Brief introduction
+  intro            text,
+
   -- Contact & location
-  cnic_no          text UNIQUE,
   permanent_addr   text,
   current_addr     text,
   country          text,

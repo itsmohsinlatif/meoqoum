@@ -339,7 +339,12 @@ export const JOIN = {
   eduField:      { en: 'Field of Education',  ur: 'تعلیم کا میدان',          mew: 'تعلیم کو میدان'        } as L,
   profession:    { en: 'Profession',          ur: 'پیشہ',                   mew: 'پیشو'                 } as L,
   bloodGroup:    { en: 'Blood Group',         ur: 'خون کا گروپ',             mew: 'خون کو گروپ'           } as L,
-  cnic:          { en: 'CNIC / ID Number *',  ur: 'شناختی کارڈ نمبر *',     mew: 'شناختی کارڈ نمبر *'   } as L,
+  intro:         { en: 'About You',            ur: 'اپنے بارے میں',           mew: 'اپنے بارے میں'         } as L,
+  introHint: {
+    en: 'A short introduction about yourself — personality, interests, values…',
+    ur: 'اپنے بارے میں مختصر تعارف — شخصیت، دلچسپیاں، اقدار…',
+    mew: 'اپنے بارے میں مختصر تعارف — شخصیت، دلچسپیاں، اقدار…',
+  } as L,
   permAddr:      { en: 'Permanent Address *', ur: 'مستقل پتہ *',             mew: 'مستقل پتہ *'           } as L,
   currAddr:      { en: 'Current Address',     ur: 'موجودہ پتہ',              mew: 'موجودہ پتہ'            } as L,
   country:       { en: 'Country *',           ur: 'ملک *',                  mew: 'ملک *'                } as L,

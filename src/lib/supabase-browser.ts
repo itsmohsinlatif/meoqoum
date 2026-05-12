@@ -27,7 +27,7 @@ export type Profile = {
   education_level: string | null;
   education_field: string | null;
   profession: string | null;
-  cnic_no: string | null;
+  intro: string | null;
   permanent_addr: string | null;
   current_addr: string | null;
   country: string | null;
