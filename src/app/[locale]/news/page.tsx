@@ -1,9 +1,12 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { PinIcon, Arrow } from '@/components/svg';
 import { routing } from '@/config/routing';
 import { NEWS, type Locale } from '@/data/content';
+
+const DEMO = 'https://res.cloudinary.com/demo/image/upload';
 
 export default async function NewsPage({
   params,
@@ -149,12 +152,24 @@ export default async function NewsPage({
           }}>
             {n.feed.map((a, i) => (
               <article key={i} className="mp-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                {/* Photo placeholder */}
-                <div className="mp-photo" style={{ height: 'clamp(180px,17vw,220px)', background: feedBgs[i], position: 'relative' }}>
+                {/* Cover image */}
+                <div style={{ height: 'clamp(180px,17vw,220px)', position: 'relative', overflow: 'hidden', background: feedBgs[i % feedBgs.length] }}>
+                  {(a as { img?: string }).img && (
+                    <Image
+                      src={`${DEMO}/w_600,h_280,c_fill,q_auto,f_auto/${(a as { img?: string }).img}`}
+                      alt={a.t.en}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width:768px) 100vw, 400px"
+                    />
+                  )}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,15,8,0.55) 0%, transparent 60%)',
+                  }} />
                   <div style={{
                     position: 'absolute',
-                    insetInlineStart: 16,
-                    top: 16,
+                    insetInlineStart: 14, top: 14,
                     background: 'var(--cream)', color: 'var(--emerald)',
                     padding: '4px 10px',
                     fontSize: 10, fontWeight: 600,

@@ -45,6 +45,7 @@ export type Profile = {
   is_verified: boolean;
   is_active: boolean;
   created_at: string;
+  updated_at: string;
 };
 
 export type MarriageProfile = {
@@ -63,5 +64,7 @@ export type MarriageProfile = {
   pref_country: string | null;
   pref_notes: string | null;
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
   profiles?: Profile & { pals?: { name_en: string; name_ur: string } | null; gotras?: { name_en: string; name_ur: string } | null };
 };

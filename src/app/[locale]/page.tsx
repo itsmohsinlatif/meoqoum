@@ -235,6 +235,77 @@ export default async function HomePage({
         </div>
       </section>
 
+      {/* PHOTO GALLERY — Our Land, Our People */}
+      <section style={{
+        background: 'var(--emerald-deep)',
+        padding: 'clamp(48px,6vw,80px) clamp(20px,5vw,64px)',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <span className="mp-eyebrow center" style={{ fontFamily: ff, color: 'var(--gold-light)' }}>
+              {locale === 'en' ? 'Our Land · Our People' : locale === 'ur' ? 'ہماری دھرتی · ہمارے لوگ' : 'ہماری دھرتی · ہمارے لوگ'}
+            </span>
+            <h2 style={{
+              fontFamily: ffH, fontSize: 'clamp(28px,3.5vw,44px)',
+              color: 'var(--cream)', marginTop: 14,
+            }}>
+              {locale === 'en' ? 'Mewat through the seasons' : locale === 'ur' ? 'میوات موسم بہ موسم' : 'میوات موسم بہ موسم'}
+            </h2>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+            gap: 4,
+          }}>
+            {[
+              { id: 'cld-sample-5', label: locale === 'en' ? 'Historical Mewat' : 'تاریخی میوات', effect: 'e_sepia:40' },
+              { id: 'cld-sample-3', label: locale === 'en' ? 'Community life' : 'سماجی زندگی', effect: 'e_improve' },
+              { id: 'cld-sample-4', label: locale === 'en' ? 'Aravalli landscape' : 'اراولی منظر', effect: 'e_improve' },
+              { id: 'cld-sample-2', label: locale === 'en' ? 'Mewati village' : 'میواتی گاؤں', effect: 'e_improve' },
+              { id: 'cld-sample',   label: locale === 'en' ? 'Harvest season' : 'فصل کا موسم', effect: 'e_improve' },
+              { id: 'cld-sample-5', label: locale === 'en' ? 'Heritage mosque' : 'تاریخی مسجد', effect: 'e_art:incognito' },
+            ].map((photo, i) => (
+              <div key={i} style={{
+                position: 'relative', overflow: 'hidden',
+                height: 'clamp(180px,18vw,260px)',
+                background: 'var(--emerald)',
+              }}>
+                <Image
+                  src={`${DEMO}/w_500,h_300,c_fill,q_auto,f_auto,${photo.effect}/${photo.id}`}
+                  alt={photo.label}
+                  fill
+                  style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                  sizes="(max-width:768px) 50vw, 25vw"
+                />
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(to top, rgba(0,20,10,0.7) 0%, transparent 55%)',
+                }} />
+                <div style={{
+                  position: 'absolute', bottom: 12, insetInlineStart: 14,
+                  fontFamily: ff, fontSize: 12, color: 'var(--cream)',
+                  fontWeight: 500, letterSpacing: locale === 'en' ? '0.06em' : 0,
+                }}>
+                  {photo.label}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{
+            textAlign: 'center', marginTop: 20,
+            fontFamily: ff, fontSize: 12,
+            color: 'rgba(245,245,220,0.4)',
+          }}>
+            {locale === 'en'
+              ? 'Sample images — upload your own Mewat photos to editors@meoqoum.com'
+              : locale === 'ur'
+              ? 'نمونہ تصاویر — اپنی میوات کی تصویریں editors@meoqoum.com پر بھیجیں'
+              : 'نمونہ تصویراں — اپنی میوات کی تصویراں editors@meoqoum.com پر بھیجو'}
+          </p>
+        </div>
+      </section>
+
       {/* FEATURED ARCHIVE */}
       <section style={{
         background: 'var(--paper)',

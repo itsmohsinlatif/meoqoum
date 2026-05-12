@@ -149,7 +149,18 @@ export default function DirectoryPage({
 
               {/* Body */}
               <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                {/* Vansh badge */}
+                <div style={{
+                  display: 'inline-flex', alignSelf: 'flex-start',
+                  background: 'var(--cream)', border: '1px solid var(--gold-soft)',
+                  color: 'var(--gold-soft)', fontFamily: 'var(--sans)',
+                  fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
+                  padding: '3px 8px', marginBottom: 14, textTransform: 'uppercase',
+                }}>
+                  {(g as typeof g & { vansh?: string }).vansh ?? ''}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                   {[
                     { label: d.field.region[locale], value: g.region[locale] },
                     { label: d.field.era[locale],    value: g.era[locale] },
@@ -162,12 +173,39 @@ export default function DirectoryPage({
                       }}>
                         {item.label}
                       </div>
-                      <div style={{ fontSize: 14, color: 'var(--ink)', fontFamily: ff }}>
+                      <div style={{ fontSize: 13, color: 'var(--ink)', fontFamily: ff }}>
                         {item.value}
                       </div>
                     </div>
                   ))}
                 </div>
+
+                {/* Origin story */}
+                {(g as typeof g & { story?: { en: string; ur: string; mew: string } }).story && (
+                  <p style={{
+                    fontSize: 13, lineHeight: 1.65, color: 'var(--ink-soft)',
+                    fontFamily: ff, marginBottom: 14,
+                    paddingBottom: 14, borderBottom: '1px solid var(--rule)',
+                  }}>
+                    {(g as typeof g & { story?: { en: string; ur: string; mew: string } }).story![locale]}
+                  </p>
+                )}
+
+                {/* Key villages */}
+                {(g as typeof g & { keyVillages?: string }).keyVillages && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{
+                      fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+                      textTransform: 'uppercase', color: 'var(--gold-soft)',
+                      fontFamily: 'var(--sans)', marginBottom: 5,
+                    }}>
+                      {locale === 'en' ? 'Key Villages' : locale === 'ur' ? 'اہم گاؤں' : 'اہم گاؤں'}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-mute)', fontFamily: ff, lineHeight: 1.5 }}>
+                      {(g as typeof g & { keyVillages?: string }).keyVillages}
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', gap: 8, marginBottom: 16, paddingTop: 14, borderTop: '1px solid var(--rule)' }}>
                   {[
@@ -175,7 +213,6 @@ export default function DirectoryPage({
                     { n: g.villages, label: d.field.villages[locale] },
                   ].map((item, j) => (
                     <div key={j} style={{ flex: 1, textAlign: 'center' }}>
-                      {j === 1 && <div style={{ position: 'absolute', width: 1, background: 'var(--rule)', alignSelf: 'stretch' }} />}
                       <div style={{ fontFamily: ffH, fontSize: 22, color: 'var(--emerald)', fontWeight: 500 }}>
                         {item.n}
                       </div>

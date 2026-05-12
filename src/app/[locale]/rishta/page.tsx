@@ -11,6 +11,7 @@ import { routing } from '@/config/routing';
 import { RISHTA, type Locale } from '@/data/content';
 import { PALS, GOTRAS, EDUCATION_LEVELS, MARITAL_STATUS, COUNTRIES } from '@/data/form-options';
 import { getSupabase, type MarriageProfile } from '@/lib/supabase-browser';
+import { SAMPLE_RISHTA } from '@/data/sample-profiles';
 import { cldUrl } from '@/lib/cloudinary';
 import type { User } from '@supabase/supabase-js';
 
@@ -263,6 +264,9 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
       const { data } = await q;
       let results = (data ?? []) as MarriageProfile[];
 
+      /* Fall back to sample data when DB is empty or not yet configured */
+      if (results.length === 0) results = SAMPLE_RISHTA as MarriageProfile[];
+
       /* Client-side age filter */
       if (ageMin || ageMax) {
         results = results.filter(mp => {
@@ -271,6 +275,11 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
           return age >= Number(ageMin || 18) && age <= Number(ageMax || 100);
         });
       }
+
+      /* Client-side gender/pal filter on sample data */
+      if (gender)  results = results.filter(mp => mp.profiles?.gender === gender);
+      if (palId)   results = results.filter(mp => String(mp.profiles?.pal_id) === palId);
+      if (country) results = results.filter(mp => mp.profiles?.country === country);
 
       setProfiles(results);
     } finally {
