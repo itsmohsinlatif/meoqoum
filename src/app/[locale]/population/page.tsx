@@ -116,26 +116,26 @@ export default function PopulationPage({
   const worldTotal    = indiaTotal + pakistanTotal;
 
   const timeline = locale === 'en' ? [
-    { year: '1947', event: 'Partition of India — ~193,000 Meos migrate to Pakistan. Mewati becomes an "unrecognised" migrant tongue.' },
+    { year: '1947', event: 'Partition divides the Meo homeland. ~193,000 Meos become part of Pakistan — full citizens of the new country. Some later move abroad for work or study.' },
     { year: '1971', event: 'India census records 401,596 Mewati speakers. Pakistan census does not list Mewati as a separate language.' },
-    { year: '1995', event: 'First Mewati literary magazine in Pakistan. Only 12 writers actively using the language.' },
-    { year: '2005', event: 'Mewati included in some Pakistan cultural surveys, but not the official census.' },
-    { year: '2011', event: 'India census: 856,643 Mewati speakers — doubling over 40 years, reflecting population growth.' },
-    { year: '2017', event: 'Community activists in Kasur begin formal campaign to include Mewati in the 2023 census.' },
-    { year: '2023', event: '76 years after migration, the Pakistan Census officially counts Mewati: 1,094,219 speakers — more than in India.' },
+    { year: '1995', event: 'First Mewati literary magazine published in Pakistan. Only 12 writers actively using the language.' },
+    { year: '2005', event: 'Mewati included in some Pakistan cultural surveys, but still absent from the official census.' },
+    { year: '2011', event: 'India census: 856,643 Mewati speakers — reflecting natural population growth over 40 years.' },
+    { year: '2017', event: 'Pakistani Meo community activists begin formal campaign to include Mewati in the 2023 census.' },
+    { year: '2023', event: 'Pakistan Census officially recognises Mewati as a distinct language: 1,094,219 speakers — more than in India. A milestone for Pakistani Meos.' },
   ] : locale === 'ur' ? [
-    { year: '۱۹۴۷', event: 'تقسیم ہند — تقریباً ۱۹۳,۰۰۰ میو پاکستان ہجرت کرتے ہیں۔ میواتی ایک "غیر تسلیم شدہ" مہاجر زبان بن جاتی ہے۔' },
+    { year: '۱۹۴۷', event: 'تقسیم نے میوات کوں دو حصاں میں بانٹ دیو۔ تقریباً ۱۹۳,۰۰۰ میو پاکستان کے مکمل شہری بن گئے۔ بعد میں کچھ کام یا تعلیم کے لیے باہر چلے گئے۔' },
     { year: '۱۹۷۱', event: 'بھارتی مردم شماری میں ۴۰۱,۵۹۶ میواتی بولنے والے درج ہوئے۔ پاکستان میواتی کو علیحدہ زبان تسلیم نہیں کرتا۔' },
     { year: '۱۹۹۵', event: 'پاکستان میں پہلا میواتی ادبی رسالہ شائع۔ صرف ۱۲ لکھاری زبان کو فعال طور پر استعمال کر رہے تھے۔' },
     { year: '۲۰۰۵', event: 'میواتی کو بعض پاکستانی ثقافتی سروے میں شامل کیا گیا، لیکن سرکاری مردم شماری میں نہیں۔' },
-    { year: '۲۰۱۱', event: 'بھارتی مردم شماری: ۸۵۶,۶۴۳ میواتی بولنے والے — ۴۰ سالوں میں تعداد دوگنی ہوگئی۔' },
-    { year: '۲۰۱۷', event: 'قصور کے کمیونٹی کارکنوں نے ۲۰۲۳ کی مردم شماری میں میواتی کی شمولیت کی باضابطہ مہم شروع کی۔' },
-    { year: '۲۰۲۳', event: 'ہجرت کے ۷۶ سال بعد، پاکستانی مردم شماری نے باضابطہ میواتی کو گنا: ۱,۰۹۴,۲۱۹ بولنے والے — بھارت سے زیادہ۔' },
+    { year: '۲۰۱۱', event: 'بھارتی مردم شماری: ۸۵۶,۶۴۳ میواتی بولنے والے — قدرتی آبادی میں اضافہ۔' },
+    { year: '۲۰۱۷', event: 'پاکستانی میو کمیونٹی کارکنوں نے ۲۰۲۳ کی مردم شماری میں میواتی کی شمولیت کی باضابطہ مہم شروع کی۔' },
+    { year: '۲۰۲۳', event: 'پاکستانی مردم شماری نے باضابطہ میواتی کو الگ زبان تسلیم کیا: ۱,۰۹۴,۲۱۹ بولنے والے — بھارت سے زیادہ۔ پاکستانی میواں کے لیے ایک اہم سنگ میل۔' },
   ] : [
-    { year: '۱۹۴۷', event: 'تقسیم — تقریباً ۱۹۳,۰۰۰ میو پاکستان ہجرت کرگئے۔ میواتی ایک "بے پہچان" ہجرتی بولی بن گئی۔' },
+    { year: '۱۹۴۷', event: 'تقسیم نے میوات کوں دو حصاں میں بانٹ دیو۔ تقریباً ۱۹۳,۰۰۰ میو پاکستان کے مکمل شہری بن گئے۔' },
     { year: '۱۹۷۱', event: 'بھارتی مردم شماری میں ۴۰۱,۵۹۶ میواتی بولنے والے درج ہوئے۔ پاکستان میواتی کوں الگ زبان نہیں مانتو۔' },
     { year: '۲۰۱۱', event: 'بھارتی مردم شماری: ۸۵۶,۶۴۳ میواتی بولنے والے۔' },
-    { year: '۲۰۲۳', event: 'ہجرت کے ۷۶ سال بعد پاکستانی مردم شماری نے باضابطہ میواتی کوں گنو: ۱,۰۹۴,۲۱۹ بولنے والے۔' },
+    { year: '۲۰۲۳', event: 'پاکستانی مردم شماری نے باضابطہ میواتی کوں الگ زبان منیو: ۱,۰۹۴,۲۱۹ بولنے والے۔ پاکستانی میواں کے لیے اہم مقام۔' },
   ];
 
   return (

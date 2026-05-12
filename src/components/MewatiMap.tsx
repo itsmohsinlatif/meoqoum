@@ -66,7 +66,7 @@ export const MAP_LOCATIONS: MapLocation[] = [
     lat: 31.12, lng: 74.45,
     population: 470000,
     censusYear: 2023,
-    note: 'Largest Meo settlement in Pakistan — 12% of district population. Home to Qais Muhammad Qasim, the 84-year-old teacher who championed Mewati recognition.',
+    note: 'Largest Meo community in Pakistan — 12% of district population. Home to Qais Muhammad Qasim, the 84-year-old teacher who championed Mewati recognition.',
     noteUr: 'پاکستان میں سب سے بڑی میو آبادی — ضلعی آبادی کا ۱۲٪۔ قیس محمد قاسم کا گھر، جنہوں نے میواتی کو سرکاری شناخت دلانے کی جدوجہد کی۔',
   },
   {
@@ -78,8 +78,8 @@ export const MAP_LOCATIONS: MapLocation[] = [
     lat: 31.55, lng: 74.34,
     population: 250000,
     censusYear: 2023,
-    note: '250,000 Meos — many settled in peripheral townships after 1947 Partition',
-    noteUr: '۲۵۰,۰۰۰ میو — تقسیم کے بعد نواحی بستیوں میں آباد ہوئے',
+    note: '250,000 Pakistani Meos — an established community across Lahore\'s townships and surrounding areas.',
+    noteUr: '۲۵۰,۰۰۰ پاکستانی میو — لاہور کی بستیوں اور نواحی علاقوں میں قائم کمیونٹی۔',
   },
   {
     id: 'sialkot',
@@ -114,8 +114,8 @@ export const MAP_LOCATIONS: MapLocation[] = [
     lat: 24.86, lng: 67.01,
     population: 30000,
     censusYear: 2023,
-    note: 'Urban diaspora; community maintains Mewati identity through cultural organisations',
-    noteUr: 'شہری ڈائسپورا؛ کمیونٹی ثقافتی تنظیموں کے ذریعے میواتی شناخت برقرار رکھتی ہے',
+    note: 'Pakistani Meo community in Karachi — maintains Mewati language and identity through cultural organisations.',
+    noteUr: 'کراچی میں پاکستانی میو کمیونٹی — ثقافتی تنظیموں کے ذریعے میواتی زبان اور شناخت برقرار رکھتی ہے۔',
   },
   {
     id: 'mirpurkhas',
@@ -126,8 +126,8 @@ export const MAP_LOCATIONS: MapLocation[] = [
     lat: 25.53, lng: 69.01,
     population: 10000,
     censusYear: 2023,
-    note: 'Smaller settlement in interior Sindh — agricultural community',
-    noteUr: 'اندرونی سندھ میں چھوٹی بستی',
+    note: 'Pakistani Meo community in interior Sindh — agricultural families.',
+    noteUr: 'اندرونی سندھ میں پاکستانی میو کمیونٹی — زرعی گھرانے۔',
   },
 ];
 

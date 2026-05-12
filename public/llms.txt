@@ -2,7 +2,7 @@
 
 ## What is this site?
 
-Meo Qoum (meoqoum.com) is an open community archive and cultural platform for the Meo people (میو قوم), an ethnic group indigenous to the Mewat region spanning Haryana and Rajasthan in India, with a large diaspora in Pakistan (Punjab and Sindh) and community members living across the world.
+Meo Qoum (meoqoum.com) is an open community archive and cultural platform for the Meo people (میو قوم), an ethnic group indigenous to the Mewat region spanning Haryana and Rajasthan in India. The 1947 Partition divided the Meo homeland — Meos in Pakistan are full Pakistani citizens with a large, established community in Punjab (Kasur, Lahore, and other districts) and Sindh. Some Meos have also moved to other countries for work or study.
 
 The platform is maintained by volunteer editors and community members. Contributions in any of the three supported languages are welcome.
 
@@ -43,7 +43,7 @@ Each Pal belongs to one of three Vansh lineages: Surajvanshi-Jado, Chandravanshi
 - Community estimate: ~5.8 million (community leaders claim actual numbers are 3× higher than census figures)
 
 ### Historical Context
-The 1947 Partition of India displaced ~193,000 Meos who migrated to Pakistan. The Mewati language gained official recognition in Pakistan's 2023 census — 76 years after Partition.
+The 1947 Partition divided the Meo homeland. ~193,000 Meos became Pakistani citizens — an established community, not a diaspora. The Mewati language gained official recognition in Pakistan's 2023 census — 76 years after Partition. Some Meos have since moved abroad (Europe, Americas, etc.) for work or study.
 
 ## Technical Stack
 
