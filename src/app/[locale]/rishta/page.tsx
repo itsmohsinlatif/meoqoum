@@ -207,9 +207,11 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
   const ffH = locale === 'en' ? 'var(--serif)' : 'var(--urdu)';
   const d   = RISHTA;
 
-  const [user,      setUser]      = useState<User | null>(null);
-  const [profiles,  setProfiles]  = useState<MarriageProfile[]>([]);
-  const [loading,   setLoading]   = useState(true);
+  const [user,        setUser]        = useState<User | null>(null);
+  const [profiles,    setProfiles]    = useState<MarriageProfile[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [myProfile,   setMyProfile]   = useState<{ id: string; is_active: boolean } | null | undefined>(undefined);
+  const [toggling,    setToggling]    = useState(false);
 
   /* Filters */
   const [gender,     setGender]     = useState('');
@@ -226,15 +228,56 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
     return pal ? g.palSlug === pal.slug : false;
   });
 
-  /* ── Auth + data fetch ──────────────────────────────── */
+  /* ── Auth + fetch own marriage profile ─────────────── */
   useEffect(() => {
     const sb = getSupabase();
-    sb.auth.getUser().then(({ data: { user: u } }) => setUser(u));
+    sb.auth.getUser().then(async ({ data: { user: u } }) => {
+      setUser(u);
+      if (u) {
+        const { data } = await sb
+          .from('marriage_profiles')
+          .select('id, is_active')
+          .eq('user_id', u.id)
+          .maybeSingle();
+        setMyProfile(data ?? null);
+      } else {
+        setMyProfile(null);
+      }
+    });
     const { data: { subscription } } = sb.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
+      if (!session?.user) setMyProfile(null);
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  /* ── Toggle visibility ──────────────────────────────── */
+  async function toggleProfile() {
+    if (!user) return;
+    setToggling(true);
+    const sb = getSupabase();
+    try {
+      if (myProfile === null) {
+        /* No record yet — create one and make it visible */
+        const { data } = await sb
+          .from('marriage_profiles')
+          .insert({ user_id: user.id, is_active: true })
+          .select('id, is_active')
+          .single();
+        setMyProfile(data);
+      } else if (myProfile) {
+        /* Toggle existing record */
+        const next = !myProfile.is_active;
+        await sb
+          .from('marriage_profiles')
+          .update({ is_active: next })
+          .eq('id', myProfile.id);
+        setMyProfile({ ...myProfile, is_active: next });
+      }
+    } finally {
+      setToggling(false);
+    }
+  }
 
   const fetchProfiles = useCallback(async () => {
     setLoading(true);
@@ -356,6 +399,71 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
           )}
         </div>
       </section>
+
+      {/* ── My profile visibility banner (logged-in users only) ── */}
+      {user && myProfile !== undefined && (
+        <div style={{
+          background: myProfile?.is_active ? '#f0faf4' : '#fafafa',
+          borderBottom: `2px solid ${myProfile?.is_active ? '#004225' : '#e0e0e0'}`,
+          padding: 'clamp(14px,2vw,20px) clamp(16px,5vw,64px)',
+        }}>
+          <div style={{
+            maxWidth: 1200, margin: '0 auto',
+            display: 'flex', alignItems: 'center',
+            gap: 16, flexWrap: 'wrap',
+          }}>
+            {/* Status dot + text */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+              <div style={{
+                width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                background: myProfile?.is_active ? '#22c55e' : '#94a3b8',
+                boxShadow: myProfile?.is_active ? '0 0 0 3px #bbf7d0' : 'none',
+              }} />
+              <div>
+                <span style={{
+                  fontFamily: ff, fontSize: 13, fontWeight: 600,
+                  color: 'var(--ink)',
+                }}>
+                  {d.myProfileBanner[locale]}
+                </span>
+                <span style={{
+                  fontFamily: ff, fontSize: 13,
+                  color: 'var(--ink-soft)', marginInlineStart: 8,
+                }}>
+                  {myProfile === null
+                    ? d.profileNone[locale]
+                    : myProfile.is_active
+                      ? d.profileVisible[locale]
+                      : d.profileHidden[locale]}
+                </span>
+              </div>
+            </div>
+
+            {/* Toggle button */}
+            <button
+              onClick={toggleProfile}
+              disabled={toggling}
+              style={{
+                background: myProfile?.is_active ? 'transparent' : 'var(--emerald)',
+                color: myProfile?.is_active ? '#c0392b' : 'var(--cream)',
+                border: myProfile?.is_active ? '1.5px solid #c0392b' : 'none',
+                padding: '8px 20px', cursor: toggling ? 'wait' : 'pointer',
+                fontFamily: ff, fontSize: 13, fontWeight: 600,
+                opacity: toggling ? 0.6 : 1,
+                minHeight: 38, whiteSpace: 'nowrap',
+              }}
+            >
+              {toggling
+                ? d.saving[locale]
+                : myProfile === null
+                  ? d.openProfile[locale]
+                  : myProfile.is_active
+                    ? d.hideProfile[locale]
+                    : d.showProfile[locale]}
+            </button>
+          </div>
+        </div>
+      )}
 
       <section style={{
         background: 'var(--cream)',

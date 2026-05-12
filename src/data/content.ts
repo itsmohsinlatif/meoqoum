@@ -549,9 +549,28 @@ export const RISHTA = {
   clearFilters: { en: 'Clear Filters',         ur: 'فلٹر صاف کریں',      mew: 'فلٹر صاف کرو'          } as L,
   anyOption:    { en: 'Any',                   ur: 'کوئی بھی',           mew: 'کوئی بھی'              } as L,
   noResults:    { en: 'No profiles match your filters.', ur: 'کوئی پروفائل نہیں ملی۔', mew: 'کوئی پروفائل نہیں ملی۔' } as L,
-  openRishta:   { en: 'Open my Rishta profile',ur: 'میری رشتہ پروفائل کھولیں', mew: 'میری رشتہ پروفائل کھولو' } as L,
-  degreeVerified: { en: '✓ Degree Verified',  ur: '✓ ڈگری تصدیق شدہ',   mew: '✓ ڈگری تصدیق شدہ'      } as L,
-  viewProfile:  { en: 'View Profile',          ur: 'پروفائل دیکھیں',     mew: 'پروفائل دیکھو'         } as L,
+  degreeVerified:  { en: '✓ Degree Verified',  ur: '✓ ڈگری تصدیق شدہ',   mew: '✓ ڈگری تصدیق شدہ'  } as L,
+  viewProfile:     { en: 'View Profile',       ur: 'پروفائل دیکھیں',     mew: 'پروفائل دیکھو'      } as L,
+  myProfileBanner: { en: 'Your Rishta Profile', ur: 'آپ کی رشتہ پروفائل', mew: 'تمہاری رشتہ پروفائل'} as L,
+  profileVisible:  {
+    en: 'Your profile is visible to members.',
+    ur: 'آپ کی پروفائل ممبران کو نظر آ رہی ہے۔',
+    mew: 'تمہاری پروفائل ممبراں کوں نظر آ راہی ہے۔',
+  } as L,
+  profileHidden: {
+    en: 'Your profile is hidden from the directory.',
+    ur: 'آپ کی پروفائل ڈائریکٹری سے چھپی ہوئی ہے۔',
+    mew: 'تمہاری پروفائل ڈائریکٹری سوں چھپی ہوئی ہے۔',
+  } as L,
+  profileNone: {
+    en: 'You have not opened your profile for Rishta yet.',
+    ur: 'آپ نے ابھی تک اپنی رشتہ پروفائل نہیں کھولی۔',
+    mew: 'تم نے ابھی تک اپنی رشتہ پروفائل نہیں کھولی۔',
+  } as L,
+  showProfile:  { en: 'Show my profile',  ur: 'پروفائل دکھائیں',  mew: 'پروفائل دکھاؤ'  } as L,
+  hideProfile:  { en: 'Hide my profile',  ur: 'پروفائل چھپائیں',  mew: 'پروفائل چھپاؤ'  } as L,
+  openProfile:  { en: 'Open for Rishta',  ur: 'رشتے کے لیے کھولیں', mew: 'رشتے کے لیے کھولو' } as L,
+  saving:       { en: 'Saving…',          ur: 'محفوظ ہو رہا ہے…',  mew: 'محفوظ ہو راہو ہے…' } as L,
 };
 
 /* FOOTER */
