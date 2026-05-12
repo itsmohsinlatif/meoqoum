@@ -423,12 +423,13 @@ export default function BookReader({
               isRtl={isRtl}
             />
           ) : isPdf ? (
-            /* PDF: embed directly — browser's native viewer handles it */
-            <embed
+            /* PDF: served through /api/pdf proxy which sets inline headers + CORS */
+            <iframe
               key={`${book.id}-${theme}`}
-              src={srcUrl}
-              type="application/pdf"
-              style={{ ...iframeStyle, flex: 1 } as React.CSSProperties}
+              src={`/api/pdf?url=${encodeURIComponent(srcUrl)}`}
+              title={book.title.en}
+              style={iframeStyle}
+              allowFullScreen
             />
           ) : (
             /* Archive.org or any other iframe source */
