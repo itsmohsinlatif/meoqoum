@@ -5,8 +5,26 @@ import Footer from '@/components/Footer';
 import { PinIcon, Arrow } from '@/components/svg';
 import { routing } from '@/config/routing';
 import { NEWS, type Locale } from '@/data/content';
+import { createClient } from '@supabase/supabase-js';
 
 const DEMO = 'https://res.cloudinary.com/demo/image/upload';
+const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+function getServerSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+
+type DbArticle = {
+  id: string; slug: string;
+  title_en: string; title_ur: string; title_mew: string;
+  excerpt_en: string; excerpt_ur: string; excerpt_mew: string;
+  category: string; cover_id: string | null;
+  author: string; read_min: number | null;
+  is_pinned: boolean; published_at: string;
+};
 
 export default async function NewsPage({
   params,
@@ -21,6 +39,20 @@ export default async function NewsPage({
   const ff = locale === 'en' ? 'var(--sans)' : 'var(--urdu)';
   const ffH = locale === 'en' ? 'var(--serif)' : 'var(--urdu)';
   const n = NEWS;
+
+  /* Fetch DB articles — falls back to static on error */
+  let dbFeed: DbArticle[] = [];
+  try {
+    const sb = getServerSupabase();
+    const { data } = await sb
+      .from('articles')
+      .select('id,slug,title_en,title_ur,title_mew,excerpt_en,excerpt_ur,excerpt_mew,category,cover_id,author,read_min,is_pinned,published_at')
+      .eq('is_published', true)
+      .eq('is_pinned', false)
+      .order('published_at', { ascending: false })
+      .limit(12);
+    if (data && data.length > 0) dbFeed = data as DbArticle[];
+  } catch { /* use static fallback */ }
 
   const pinnedColors: Record<string, { bg: string; fg: string }> = {
     Gathering: { bg: 'var(--emerald)',      fg: 'var(--gold-light)' },
@@ -150,76 +182,58 @@ export default async function NewsPage({
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: 'clamp(20px,2vw,24px)',
           }}>
-            {n.feed.map((a, i) => (
+            {(dbFeed.length > 0 ? dbFeed.map((a, i) => {
+              const title   = locale === 'en' ? a.title_en   : locale === 'ur' ? a.title_ur   : a.title_mew   || a.title_en;
+              const excerpt = locale === 'en' ? a.excerpt_en : locale === 'ur' ? a.excerpt_ur : a.excerpt_mew || a.excerpt_en;
+              const date    = new Date(a.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+              const coverSrc = a.cover_id && CLOUD
+                ? `https://res.cloudinary.com/${CLOUD}/image/upload/w_600,h_280,c_fill,q_auto,f_auto/${a.cover_id}`
+                : null;
+              return (
+                <article key={a.id} className="mp-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ height: 'clamp(180px,17vw,220px)', position: 'relative', overflow: 'hidden', background: feedBgs[i % feedBgs.length] }}>
+                    {coverSrc && <Image src={coverSrc} alt={title} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 400px" />}
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,15,8,0.55) 0%, transparent 60%)' }} />
+                    <div style={{ position: 'absolute', insetInlineStart: 14, top: 14, background: 'var(--cream)', color: 'var(--emerald)', padding: '4px 10px', fontSize: 10, fontWeight: 600, letterSpacing: locale === 'en' ? '0.14em' : 0, textTransform: locale === 'en' ? 'uppercase' : 'none', fontFamily: ff, zIndex: 2 }}>
+                      {a.category}
+                    </div>
+                  </div>
+                  <div style={{ padding: 22, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ fontSize: 11, color: 'var(--ink-mute)', marginBottom: 10, fontFamily: 'var(--sans)' }}>
+                      {date}{a.read_min ? ` · ${a.read_min} min read` : ''}
+                    </div>
+                    <h3 style={{ fontFamily: ffH, fontSize: 'clamp(18px,1.7vw,22px)', lineHeight: 1.25, marginBottom: 12, fontWeight: 500 }}>{title}</h3>
+                    <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--ink-soft)', marginBottom: 18, fontFamily: ff }}>{excerpt}</p>
+                    <div style={{ marginTop: 'auto', paddingTop: 14, borderTop: '1px solid var(--rule)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontFamily: ff }}>{a.author}</span>
+                      <span style={{ color: 'var(--emerald)', fontSize: 11, fontWeight: 600, fontFamily: ff, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        {n.readBtn[locale]} <Arrow dir={dir === 'rtl' ? 'left' : 'right'} />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              );
+            }) : n.feed.map((a, i) => (
               <article key={i} className="mp-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                {/* Cover image */}
                 <div style={{ height: 'clamp(180px,17vw,220px)', position: 'relative', overflow: 'hidden', background: feedBgs[i % feedBgs.length] }}>
                   {(a as { img?: string }).img && (
-                    <Image
-                      src={`${DEMO}/w_600,h_280,c_fill,q_auto,f_auto/${(a as { img?: string }).img}`}
-                      alt={a.t.en}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      sizes="(max-width:768px) 100vw, 400px"
-                    />
+                    <Image src={`${DEMO}/w_600,h_280,c_fill,q_auto,f_auto/${(a as { img?: string }).img}`} alt={a.t.en} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 400px" />
                   )}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,15,8,0.55) 0%, transparent 60%)',
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    insetInlineStart: 14, top: 14,
-                    background: 'var(--cream)', color: 'var(--emerald)',
-                    padding: '4px 10px',
-                    fontSize: 10, fontWeight: 600,
-                    letterSpacing: locale === 'en' ? '0.14em' : 0,
-                    textTransform: locale === 'en' ? 'uppercase' : 'none',
-                    fontFamily: ff, zIndex: 2,
-                  }}>
-                    {a.cat[locale]}
-                  </div>
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,15,8,0.55) 0%, transparent 60%)' }} />
+                  <div style={{ position: 'absolute', insetInlineStart: 14, top: 14, background: 'var(--cream)', color: 'var(--emerald)', padding: '4px 10px', fontSize: 10, fontWeight: 600, letterSpacing: locale === 'en' ? '0.14em' : 0, textTransform: locale === 'en' ? 'uppercase' : 'none', fontFamily: ff, zIndex: 2 }}>{a.cat[locale]}</div>
                 </div>
-
-                {/* Content */}
                 <div style={{ padding: 22, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: 11, color: 'var(--ink-mute)', marginBottom: 10, fontFamily: 'var(--sans)', letterSpacing: '0.04em' }}>
-                    {a.date} · <span style={{ color: 'var(--gold-soft)' }}>{a.read[locale]}</span>
-                  </div>
-                  <h3 style={{
-                    fontFamily: ffH, fontSize: 'clamp(18px,1.7vw,22px)',
-                    lineHeight: 1.25, marginBottom: 12, fontWeight: 500,
-                  }}>
-                    {a.t[locale]}
-                  </h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--ink-soft)', marginBottom: 18, fontFamily: ff }}>
-                    {a.ex[locale]}
-                  </p>
-
-                  <div style={{
-                    marginTop: 'auto', paddingTop: 14,
-                    borderTop: '1px solid var(--rule)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  }}>
-                    <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontFamily: ff }}>
-                      {a.author}
-                    </span>
-                    <a href="#" style={{
-                      color: 'var(--emerald)', textDecoration: 'none',
-                      fontSize: 11, fontWeight: 600,
-                      letterSpacing: locale === 'en' ? '0.12em' : 0,
-                      textTransform: locale === 'en' ? 'uppercase' : 'none',
-                      fontFamily: ff,
-                      display: 'inline-flex', alignItems: 'center', gap: 6,
-                      minHeight: 44,
-                    }}>
-                      {n.readBtn[locale]}
-                      <Arrow dir={dir === 'rtl' ? 'left' : 'right'} />
-                    </a>
+                  <div style={{ fontSize: 11, color: 'var(--ink-mute)', marginBottom: 10, fontFamily: 'var(--sans)' }}>{a.date} · <span style={{ color: 'var(--gold-soft)' }}>{a.read[locale]}</span></div>
+                  <h3 style={{ fontFamily: ffH, fontSize: 'clamp(18px,1.7vw,22px)', lineHeight: 1.25, marginBottom: 12, fontWeight: 500 }}>{a.t[locale]}</h3>
+                  <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--ink-soft)', marginBottom: 18, fontFamily: ff }}>{a.ex[locale]}</p>
+                  <div style={{ marginTop: 'auto', paddingTop: 14, borderTop: '1px solid var(--rule)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontFamily: ff }}>{a.author}</span>
+                    <span style={{ color: 'var(--emerald)', fontSize: 11, fontWeight: 600, fontFamily: ff, display: 'inline-flex', alignItems: 'center', gap: 6 }}>{n.readBtn[locale]} <Arrow dir={dir === 'rtl' ? 'left' : 'right'} /></span>
                   </div>
                 </div>
               </article>
-            ))}
+            )))}
+
           </div>
         </div>
       </section>

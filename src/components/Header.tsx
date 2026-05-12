@@ -11,7 +11,7 @@ import { getSupabase } from '@/lib/supabase-browser';
 import type { User } from '@supabase/supabase-js';
 
 interface HeaderProps {
-  active: 'home' | 'history' | 'dir' | 'news' | 'library' | 'rishta';
+  active: 'home' | 'history' | 'dir' | 'news' | 'library' | 'rishta' | 'population';
 }
 
 export default function Header({ active }: HeaderProps) {
@@ -37,16 +37,17 @@ export default function Header({ active }: HeaderProps) {
   }
 
   const brand   = BRAND[locale];
-  const navKeys = ['home', 'history', 'dir', 'news', 'library', 'rishta'] as const;
+  const navKeys = ['home', 'history', 'dir', 'news', 'library', 'rishta', 'population'] as const;
 
   function navHref(key: typeof navKeys[number]) {
     const paths: Record<typeof navKeys[number], string> = {
-      home:    `/${locale}`,
-      history: `/${locale}/history`,
-      dir:     `/${locale}/directory`,
-      news:    `/${locale}/news`,
-      library: `/${locale}/library`,
-      rishta:  `/${locale}/rishta`,
+      home:       `/${locale}`,
+      history:    `/${locale}/history`,
+      dir:        `/${locale}/directory`,
+      news:       `/${locale}/news`,
+      library:    `/${locale}/library`,
+      rishta:     `/${locale}/rishta`,
+      population: `/${locale}/population`,
     };
     return paths[key];
   }

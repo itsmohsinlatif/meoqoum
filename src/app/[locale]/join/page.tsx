@@ -201,7 +201,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
         }),
       });
 
-      const result = await res.json();
+      const result = await res.json().catch(() => ({ error: `Server error (${res.status}). Make sure the dev server was restarted after recent changes.` }));
       if (!res.ok) {
         setErrors({ form: result.error ?? 'Signup failed. Please try again.' });
         return;

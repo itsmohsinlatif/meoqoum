@@ -1,15 +1,17 @@
 'use client';
 
-import { use, useState, useCallback } from 'react';
+import { use, useState, useCallback, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BookReader from '@/components/BookReader';
 import { SearchIcon, Arrow, StarKhatim } from '@/components/svg';
 import { routing } from '@/config/routing';
 import { LIBRARY, type Locale } from '@/data/content';
-import { BOOKS, type Book, type BookCategory } from '@/data/books';
+import { BOOKS, type Book, type BookCategory, type SourceType } from '@/data/books';
 import { cldUrl } from '@/lib/cloudinary';
+import { getSupabase } from '@/lib/supabase-browser';
 
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
@@ -30,86 +32,6 @@ function CoverImage({ book, size }: { book: Book; size: number }) {
   return <div style={{ position: 'absolute', inset: 0, background: book.coverGradient }} />;
 }
 
-function sourceHref(book: Book): string {
-  if (book.source.type === 'archive') {
-    return `https://archive.org/embed/${book.source.id}`;
-  }
-  if (book.source.type === 'cloudinary' && CLOUD) {
-    return `https://res.cloudinary.com/${CLOUD}/raw/upload/${book.source.id}`;
-  }
-  return book.source.id;
-}
-
-function ReaderModal({
-  book,
-  locale,
-  onClose,
-}: {
-  book: Book;
-  locale: Locale;
-  onClose: () => void;
-}) {
-  const dir = locale === 'en' ? 'ltr' : 'rtl';
-  const ff  = locale === 'en' ? 'var(--sans)' : 'var(--urdu)';
-  const ffH = locale === 'en' ? 'var(--serif)' : 'var(--urdu)';
-  const d   = LIBRARY;
-  const src = sourceHref(book);
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
-      background: 'rgba(0,10,5,0.92)',
-      display: 'flex', flexDirection: 'column',
-    }} dir={dir}>
-      {/* Reader header bar */}
-      <div style={{
-        background: 'var(--emerald-deep)',
-        padding: '12px clamp(16px,3vw,40px)',
-        display: 'flex', alignItems: 'center', gap: 16,
-        borderBottom: '2px solid var(--gold)',
-        flexShrink: 0,
-      }}>
-        <div style={{ flex: 1 }}>
-          <div style={{
-            fontFamily: ffH,
-            fontSize: 'clamp(15px,1.4vw,20px)',
-            color: 'var(--cream)',
-            lineHeight: 1.2,
-          }}>
-            {book.title[locale] || book.title.en}
-          </div>
-          <div style={{
-            fontFamily: ff, fontSize: 12,
-            color: 'var(--gold-light)', marginTop: 2,
-          }}>
-            {book.author} · {book.year}
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'transparent',
-            border: '1px solid var(--gold)',
-            color: 'var(--gold)',
-            padding: '8px 18px',
-            fontFamily: ff, fontSize: 13, cursor: 'pointer',
-            minHeight: 44,
-          }}
-        >
-          {d.closeBtn[locale]}
-        </button>
-      </div>
-
-      {/* iframe reader */}
-      <iframe
-        src={src}
-        title={book.title.en}
-        style={{ flex: 1, border: 0, width: '100%' }}
-        allowFullScreen
-      />
-    </div>
-  );
-}
 
 export default function LibraryPage({
   params,
@@ -128,8 +50,39 @@ export default function LibraryPage({
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState<'all' | BookCategory>('all');
   const [reading,  setReading]  = useState<Book | null>(null);
+  const [dbBooks,  setDbBooks]  = useState<Book[]>([]);
 
-  const filtered = BOOKS.filter(b => {
+  /* Fetch books from Supabase and convert to the Book shape */
+  useEffect(() => {
+    getSupabase()
+      .from('books')
+      .select('*')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (!data) return;
+        const shaped: Book[] = data.map((r: Record<string, unknown>) => ({
+          id:    r.id as string,
+          slug:  r.slug as string,
+          title: { en: r.title_en as string, ur: (r.title_ur as string) || r.title_en as string, mew: (r.title_mew as string) || r.title_en as string },
+          author: r.author as string,
+          year:   (r.year as number) ?? 0,
+          language: ((r.language as string[]) || ['en']) as ('en' | 'ur' | 'mew')[],
+          category: r.category as BookCategory,
+          description: { en: r.description_en as string, ur: (r.description_ur as string) || r.description_en as string, mew: (r.description_mew as string) || r.description_en as string },
+          coverId:        (r.cover_id as string) || null,
+          coverGradient:  (r.cover_gradient as string) || 'linear-gradient(135deg,#1a3a2a,#004225)',
+          source: { type: r.source_type as SourceType, id: r.source_id as string },
+        }));
+        setDbBooks(shaped);
+      });
+  }, []);
+
+  /* DB books first (newest), then static fallbacks not already in DB by slug */
+  const dbSlugs   = new Set(dbBooks.map(b => b.slug));
+  const allBooks  = [...dbBooks, ...BOOKS.filter(b => !dbSlugs.has(b.slug))];
+
+  const filtered = allBooks.filter(b => {
     const matchCat = category === 'all' || b.category === category;
     const q = query.toLowerCase();
     const matchQ = !q
@@ -402,7 +355,7 @@ export default function LibraryPage({
       <Footer locale={locale} />
 
       {reading && (
-        <ReaderModal book={reading} locale={locale} onClose={closeReader} />
+        <BookReader book={reading} locale={locale} onClose={closeReader} />
       )}
     </div>
   );

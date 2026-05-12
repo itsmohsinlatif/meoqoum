@@ -16,6 +16,7 @@ export const NAV: Record<string, L> = {
   news:    { en: 'News',      ur: 'خبریں',      mew: 'خبراں' },
   library: { en: 'Library',   ur: 'کتب خانہ',   mew: 'کتاب گھر' },
   rishta:  { en: 'Rishta',    ur: 'رشتہ',       mew: 'رشتو' },
+  population: { en: 'Population', ur: 'آبادی کا نقشہ', mew: 'آبادی کو نقشو' },
 };
 
 /* HOME */
@@ -598,5 +599,50 @@ export const FOOTER = {
     en: '© 2026 Meo Qoum · Made with care across three borders',
     ur: '© 2026 میو قوم · تین سرحدوں کے پار محبت سے بنایا گیا',
     mew: '© 2026 میو قوم · تیناں سرحداں کے پار محبت سوں بنایو',
+  } as L,
+};
+
+/* POPULATION MAP */
+export const POPULATION = {
+  eyebrow: { en: 'Census & Diaspora', ur: 'مردم شماری و پھیلاؤ', mew: 'مردم شماری و پھیلاؤ' } as L,
+  title:   { en: 'Where Mewati Speakers Live', ur: 'میواتی بولنے والے کہاں ہیں', mew: 'میواتی بولنے والے کتھے ہاں' } as L,
+  sub: {
+    en: 'From the Mewat heartland in India to the Punjab plains of Pakistan — data from the 2011 Indian Census and 2023 Pakistan Census, plus community estimates.',
+    ur: 'ہندوستان کے میوات سے پاکستان کے پنجاب کے میدانوں تک — 2011 بھارتی اور 2023 پاکستانی مردم شماری کے اعداد و شمار۔',
+    mew: 'ہندوستان کے میوات سوں پاکستان کے پنجاب تک — 2011 بھارتی اور 2023 پاکستانی مردم شماری کے اعداد و شمار۔',
+  } as L,
+  indiaLabel:    { en: 'India',    ur: 'بھارت',   mew: 'بھارت'  } as L,
+  pakistanLabel: { en: 'Pakistan', ur: 'پاکستان', mew: 'پاکستان'} as L,
+  censusYear:    { en: 'Census year', ur: 'مردم شماری سال', mew: 'مردم شماری سال' } as L,
+  speakers:      { en: 'speakers',   ur: 'بولنے والے',      mew: 'بولنے والے'     } as L,
+  estimateNote: {
+    en: 'Community leaders claim actual numbers are 3× higher than census figures.',
+    ur: 'کمیونٹی رہنماؤں کا دعویٰ ہے کہ اصل تعداد مردم شماری سے تین گنا زیادہ ہے۔',
+    mew: 'کمیونٹی آگواں کو دعویٰ ہے کہ اصل تعداد مردم شماری سوں تین گنا زادو ہے۔',
+  } as L,
+  recognitionTitle: {
+    en: '76 Years to Recognition',
+    ur: '۷۶ سال بعد باضابطہ شناخت',
+    mew: '۷۶ سال بعد باضابطہ شناخت',
+  } as L,
+  recognitionBody: {
+    en: 'Mewati migrated to Pakistan in 1947 alongside 193,000 Meos displaced by Partition. After 76 years of advocacy, the 2023 Pakistan Census officially counted Mewati as a distinct language — giving the diaspora a formal identity for the first time.',
+    ur: '۱۹۴۷ میں تقسیم کے نتیجے میں ۱۹۳,۰۰۰ میو پاکستان ہجرت کر گئے۔ ۷۶ سال کی کوشش کے بعد ۲۰۲۳ کی مردم شماری میں پہلی بار میواتی کو ایک الگ زبان کے طور پر شمار کیا گیا۔',
+    mew: '۱۹۴۷ میں تقسیم میں ۱۹۳,۰۰۰ میو پاکستان ہجرت کر گئے۔ ۷۶ سال کی محنت کے بعد ۲۰۲۳ کی مردم شماری میں پہلی بار میواتی کوں الگ زبان گنو گیو۔',
+  } as L,
+  writersTitle: {
+    en: 'Literary Revival',
+    ur: 'ادبی بیداری',
+    mew: 'ادبی جاگرتی',
+  } as L,
+  sourceCredit: {
+    en: 'Data source: Lok Sujag / 2011 Indian Census / 2023 Pakistan Census',
+    ur: 'ماخذ: لوک سجاگ / 2011 بھارتی مردم شماری / 2023 پاکستانی مردم شماری',
+    mew: 'ماخذ: لوک سجاگ / 2011 بھارتی مردم شماری / 2023 پاکستانی مردم شماری',
+  } as L,
+  clickHint: {
+    en: 'Click any circle to see details',
+    ur: 'تفصیل دیکھنے کے لیے کسی بھی دائرے پر کلک کریں',
+    mew: 'تفصیل دیکھنے کے واسطے کسی دائرے پر کلک کرو',
   } as L,
 };

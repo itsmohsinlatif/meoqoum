@@ -1,5 +1,5 @@
 export type BookCategory = 'history' | 'language' | 'culture' | 'religion' | 'literature';
-export type SourceType   = 'archive' | 'cloudinary' | 'pdf_url';
+export type SourceType   = 'archive' | 'cloudinary' | 'pdf_url' | 'epub_url';
 
 export interface Book {
   id: string;

@@ -4,5 +4,5 @@ import { routing } from './config/routing';
 export default createMiddleware(routing);
 
 export const config = {
-  matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
