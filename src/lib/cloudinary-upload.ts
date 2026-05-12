@@ -1,12 +1,15 @@
-const CLOUD  = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
+const CLOUD  = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME  ?? '';
+const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? '';
 
 export type UploadResult = { publicId: string; url: string };
 
+/** Returns null (instead of throwing) when Cloudinary isn't configured. */
 export async function uploadToCloudinary(
   file: File,
   folder: string = 'meoqoum'
-): Promise<UploadResult> {
+): Promise<UploadResult | null> {
+  if (!CLOUD || !PRESET) return null;
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', PRESET);
@@ -26,10 +29,13 @@ export async function uploadToCloudinary(
   return { publicId: data.public_id as string, url: data.secure_url as string };
 }
 
+/** Returns null when Cloudinary isn't configured. */
 export async function uploadDocToCloudinary(
   file: File,
   folder: string = 'meoqoum/degrees'
-): Promise<UploadResult> {
+): Promise<UploadResult | null> {
+  if (!CLOUD || !PRESET) return null;
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', PRESET);

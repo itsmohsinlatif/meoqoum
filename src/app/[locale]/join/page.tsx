@@ -88,19 +88,14 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     whatsapp: '', facebook: '', instagram: '', linkedin: '', twitter: '',
   });
 
-  const [pics, setPics] = useState<[
-    { file: File | null; preview: string | null; id: string | null },
-    { file: File | null; preview: string | null; id: string | null },
-  ]>([
-    { file: null, preview: null, id: null },
-    { file: null, preview: null, id: null },
-  ]);
+  const [pic, setPic] = useState<{ file: File | null; preview: string | null; id: string | null }>({
+    file: null, preview: null, id: null,
+  });
 
-  const [loading,  setLoading]  = useState(false);
-  const [errors,   setErrors]   = useState<Partial<typeof f & { form: string }>>({});
-  const [success,  setSuccess]  = useState(false);
-  const picRef1 = useRef<HTMLInputElement>(null);
-  const picRef2 = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [errors,  setErrors]  = useState<Partial<typeof f & { form: string }>>({});
+  const [success, setSuccess] = useState(false);
+  const picRef = useRef<HTMLInputElement>(null);
 
   /* ── derived: filtered gotras by pal, provinces by country, cities by province */
   const palGotras = GOTRAS.filter(g => {
@@ -123,18 +118,11 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     });
   }
 
-  function handlePic(slot: 0 | 1, e: React.ChangeEvent<HTMLInputElement>) {
+  function handlePic(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be under 5 MB.');
-      return;
-    }
-    setPics(prev => {
-      const next = [...prev] as typeof prev;
-      next[slot] = { file, preview: URL.createObjectURL(file), id: null };
-      return next;
-    });
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5 MB.'); return; }
+    setPic({ file, preview: URL.createObjectURL(file), id: null });
   }
 
   function validate(): boolean {
@@ -167,17 +155,14 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     try {
       const sb = getSupabase();
 
-      /* 1. Upload up to 2 profile pictures */
-      const uploadedIds: [string | null, string | null] = [pics[0].id, pics[1].id];
-      for (const slot of [0, 1] as const) {
-        if (pics[slot].file && !uploadedIds[slot]) {
-          const r = await uploadToCloudinary(pics[slot].file!, 'meoqoum/profiles');
-          uploadedIds[slot] = r.publicId;
-          setPics(prev => {
-            const next = [...prev] as typeof prev;
-            next[slot] = { ...next[slot], id: r.publicId };
-            return next;
-          });
+      /* 1. Upload profile picture (optional — silently skipped if Cloudinary not configured) */
+      let uploadedPicId: string | null = pic.id;
+      if (pic.file && !uploadedPicId) {
+        try {
+          const r = await uploadToCloudinary(pic.file, 'meoqoum/profiles');
+          uploadedPicId = r?.publicId ?? null;
+        } catch {
+          // Photo upload failed — registration continues without photo
         }
       }
 
@@ -221,8 +206,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
         state_province:  f.province || null,
         city:            f.city || null,
         contact_no:       f.contact.trim() || null,
-        profile_pic_id:   uploadedIds[0],
-        profile_pic_id_2: uploadedIds[1],
+        profile_pic_id:   uploadedPicId,
         social_whatsapp:  f.whatsapp.trim()  || null,
         social_facebook:  f.facebook.trim()  || null,
         social_instagram: f.instagram.trim() || null,
@@ -498,7 +482,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
               </Field>
             </Section>
 
-            {/* ── S6 Photos (max 2) ── */}
+            {/* ── S6 Profile Photo ── */}
             <fieldset style={{ border: 0, padding: 0, margin: '0 0 36px' }}>
               <legend style={{
                 fontFamily: ff, fontSize: 13, fontWeight: 700,
@@ -508,63 +492,48 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
               }}>
                 {d.s6[locale]}
               </legend>
-              <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-                {([0, 1] as const).map(slot => (
-                  <div key={slot} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{
-                      width: 100, height: 100, flexShrink: 0,
-                      position: 'relative', overflow: 'hidden',
-                      background: 'var(--rule)',
-                      border: '1.5px dashed var(--rule)',
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+                {/* Preview */}
+                <div style={{
+                  width: 100, height: 100, flexShrink: 0,
+                  position: 'relative', overflow: 'hidden',
+                  border: '1.5px dashed var(--rule)',
+                  background: 'linear-gradient(135deg, #e8f4ee, var(--emerald))',
+                }}>
+                  {pic.preview
+                    ? <Image src={pic.preview} alt="Profile photo" fill style={{ objectFit: 'cover' }} />
+                    : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 32, opacity: 0.3 }}>📷</span>
+                      </div>
+                  }
+                </div>
+
+                {/* Controls */}
+                <div>
+                  <button type="button" onClick={() => picRef.current?.click()}
+                    style={{
+                      border: '1.5px solid var(--emerald)', background: 'transparent',
+                      color: 'var(--emerald)', padding: '8px 16px',
+                      fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                      display: 'block', marginBottom: 6,
                     }}>
-                      {pics[slot].preview
-                        ? <Image src={pics[slot].preview!} alt={`Photo ${slot + 1}`} fill style={{ objectFit: 'cover' }} />
-                        : (
-                          <div style={{
-                            width: '100%', height: '100%',
-                            background: slot === 0
-                              ? 'linear-gradient(135deg, var(--emerald-soft,#e8f4ee), var(--emerald))'
-                              : 'linear-gradient(135deg, #d4af3722, var(--gold))',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <span style={{ fontSize: 30, opacity: 0.35 }}>📷</span>
-                          </div>
-                        )
-                      }
-                    </div>
-                    <div>
-                      <button type="button"
-                        onClick={() => (slot === 0 ? picRef1 : picRef2).current?.click()}
-                        style={{
-                          border: '1.5px solid var(--emerald)', background: 'transparent',
-                          color: 'var(--emerald)', padding: '8px 16px',
-                          fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                          display: 'block', marginBottom: 6,
-                        }}>
-                        {slot === 0 ? d.uploadPic[locale] : d.uploadPic2[locale]}
-                      </button>
-                      <p style={{ fontFamily: ff, fontSize: 11, color: 'var(--ink-mute)' }}>
-                        JPG/PNG · max 5 MB
-                      </p>
-                      {pics[slot].preview && (
-                        <button type="button"
-                          onClick={() => setPics(prev => {
-                            const next = [...prev] as typeof prev;
-                            next[slot] = { file: null, preview: null, id: null };
-                            return next;
-                          })}
-                          style={{ background: 'transparent', border: 0, cursor: 'pointer', color: '#c0392b', fontSize: 11, fontFamily: ff, padding: 0 }}>
-                          ✕ {locale === 'en' ? 'Remove' : 'ہٹائیں'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                    {d.uploadPic[locale]}
+                  </button>
+                  <p style={{ fontFamily: ff, fontSize: 11, color: 'var(--ink-mute)', margin: '0 0 6px' }}>
+                    JPG/PNG · max 5 MB ·{' '}
+                    {locale === 'en' ? 'optional' : locale === 'ur' ? 'اختیاری' : 'اختیاری'}
+                  </p>
+                  {pic.preview && (
+                    <button type="button"
+                      onClick={() => setPic({ file: null, preview: null, id: null })}
+                      style={{ background: 'transparent', border: 0, cursor: 'pointer', color: '#c0392b', fontSize: 11, fontFamily: ff, padding: 0 }}>
+                      ✕ {locale === 'en' ? 'Remove' : locale === 'ur' ? 'ہٹائیں' : 'ہٹاؤ'}
+                    </button>
+                  )}
+                  <input ref={picRef} type="file" accept="image/*"
+                    style={{ display: 'none' }} onChange={handlePic} />
+                </div>
               </div>
-              <input ref={picRef1} type="file" accept="image/*" style={{ display: 'none' }}
-                onChange={e => handlePic(0, e)} />
-              <input ref={picRef2} type="file" accept="image/*" style={{ display: 'none' }}
-                onChange={e => handlePic(1, e)} />
             </fieldset>
 
             {/* ── S7 Social Media ── */}
