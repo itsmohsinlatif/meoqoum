@@ -52,9 +52,14 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
     pref_education: '', pref_country: '', pref_notes: '',
     is_active: false,
   });
-  const [rishtaExists, setRishtaExists] = useState(false);
-  const [rishtaSaving, setRishtaSaving] = useState(false);
-  const [rishtaMsg,    setRishtaMsg]    = useState('');
+  const [rishtaExists,   setRishtaExists]   = useState(false);
+  const [rishtaSaving,   setRishtaSaving]   = useState(false);
+  const [rishtaMsg,      setRishtaMsg]      = useState('');
+  const [degreeDocId,    setDegreeDocId]    = useState<string | null>(null);
+  const [degreeType,     setDegreeType]     = useState('');
+  const [degreeUploading, setDegreeUploading] = useState(false);
+  const [degreeMsg,      setDegreeMsg]      = useState('');
+  const degreeRef = useRef<HTMLInputElement>(null);
 
   /* ── Password fields ── */
   const [newPass,    setNewPass]    = useState('');
@@ -101,6 +106,8 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
           pref_notes:     mp.pref_notes ?? '',
           is_active:      mp.is_active ?? false,
         });
+        setDegreeDocId(mp.degree_doc_id ?? null);
+        setDegreeType(mp.degree_type ?? '');
       }
       setLoading(false);
     }
@@ -158,6 +165,8 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
       pref_country:   rishta.pref_country || null,
       pref_notes:     rishta.pref_notes || null,
       is_active:      rishta.is_active,
+      degree_doc_id:  degreeDocId,
+      degree_type:    degreeType.trim() || null,
     };
     const sb = getSupabase();
     const { error } = rishtaExists
@@ -168,6 +177,34 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
     if (error) { setRishtaMsg(locale === 'en' ? 'Save failed: ' + error.message : 'ناکام۔'); return; }
     setRishtaExists(true);
     setRishtaMsg(locale === 'en' ? '✓ Rishta profile saved.' : '✓ رشتہ پروفائل محفوظ۔');
+  }
+
+  /* ── Degree PDF upload ── */
+  const MAX_DEGREE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+  async function handleDegreeUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_DEGREE_BYTES) {
+      setDegreeMsg(locale === 'en'
+        ? `File is ${(file.size / 1024 / 1024).toFixed(1)} MB — maximum is 5 MB. Please compress the PDF.`
+        : `فائل ${(file.size / 1024 / 1024).toFixed(1)} MB ہے — زیادہ سے زیادہ 5 MB۔ PDF کو چھوٹا کریں۔`);
+      e.target.value = '';
+      return;
+    }
+    setDegreeUploading(true); setDegreeMsg('');
+    try {
+      const { uploadDocToCloudinary } = await import('@/lib/cloudinary-upload');
+      const r = await uploadDocToCloudinary(file, 'meoqoum/degrees');
+      if (r) {
+        setDegreeDocId(r.publicId);
+        setDegreeMsg(locale === 'en' ? '✓ Document uploaded. Save your profile to confirm.' : '✓ دستاویز اپ لوڈ ہو گئی۔ پروفائل محفوظ کریں۔');
+      }
+    } catch (err) {
+      setDegreeMsg(String(err));
+    } finally {
+      setDegreeUploading(false);
+    }
   }
 
   /* ── Change password ── */
@@ -378,6 +415,41 @@ export default function ProfilePage({ params }: { params: Promise<{ locale: stri
                     {['fair', 'medium', 'olive', 'dark'].map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                   </select>
                 </div>
+              </div>
+
+              {/* Degree / Achievement PDF */}
+              <div style={{ borderTop: '1px solid var(--rule)', paddingTop: 16 }}>
+                <div style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold-soft)', marginBottom: 14 }}>
+                  {locale === 'en' ? 'Degree / Achievement Document' : 'ڈگری / اہم دستاویز'}
+                </div>
+                <p style={{ fontFamily: ff, fontSize: 12, color: 'var(--ink-mute)', lineHeight: 1.6, marginBottom: 12 }}>
+                  {locale === 'en'
+                    ? 'Upload one PDF (max 5 MB) combining your degrees, certificates or other achievements for admin verification.'
+                    : 'ایک PDF (زیادہ سے زیادہ 5 MB) اپ لوڈ کریں جس میں آپ کی ڈگریاں، سرٹیفکیٹ یا دیگر کامیابیاں شامل ہوں۔ ایڈمن تصدیق کرے گا۔'}
+                </p>
+
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>{locale === 'en' ? 'Degree / Document Type' : 'ڈگری / دستاویز کی قسم'}</label>
+                  <input style={inputStyle} value={degreeType} onChange={e => setDegreeType(e.target.value)} placeholder={locale === 'en' ? 'e.g. MBBS, BSc Engineering, MBA…' : 'مثلاً MBBS، BSc انجینئرنگ، MBA…'} />
+                </div>
+
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                  <input ref={degreeRef} type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleDegreeUpload} />
+                  <button type="button" onClick={() => degreeRef.current?.click()} disabled={degreeUploading}
+                    style={{ background: 'var(--emerald-soft, #f0f8f4)', border: '1.5px dashed var(--emerald)', color: 'var(--emerald)', fontFamily: ff, fontSize: 13, fontWeight: 600, padding: '9px 18px', cursor: degreeUploading ? 'not-allowed' : 'pointer', opacity: degreeUploading ? 0.7 : 1 }}>
+                    {degreeUploading ? (locale === 'en' ? '⏳ Uploading…' : '⏳ اپ لوڈ ہو رہا ہے…') : (locale === 'en' ? '↑ Upload PDF (max 5 MB)' : '↑ PDF اپ لوڈ کریں (زیادہ سے زیادہ 5 MB)')}
+                  </button>
+                  {degreeDocId && (
+                    <a href={`/api/pdf?url=https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${degreeDocId}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: ff, fontSize: 12, color: 'var(--emerald)', textDecoration: 'underline' }}>
+                      {locale === 'en' ? '📄 View uploaded document' : '📄 اپ لوڈ شدہ دستاویز دیکھیں'}
+                    </a>
+                  )}
+                </div>
+                {degreeMsg && (
+                  <p style={{ fontFamily: ff, fontSize: 12, color: degreeMsg.startsWith('✓') ? 'var(--emerald)' : '#c0392b', marginTop: 8, margin: '8px 0 0' }}>{degreeMsg}</p>
+                )}
               </div>
 
               <div style={{ borderTop: '1px solid var(--rule)', paddingTop: 16 }}>
