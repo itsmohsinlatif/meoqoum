@@ -153,71 +153,62 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
     setErrors({});
 
     try {
-      const sb = getSupabase();
-
-      /* 1. Upload profile picture (optional — silently skipped if Cloudinary not configured) */
+      /* 1. Upload profile picture (optional) */
       let uploadedPicId: string | null = pic.id;
       if (pic.file && !uploadedPicId) {
         try {
           const r = await uploadToCloudinary(pic.file, 'meoqoum/profiles');
           uploadedPicId = r?.publicId ?? null;
         } catch {
-          // Photo upload failed — registration continues without photo
+          /* continue without photo */
         }
       }
 
-      /* 2. Create auth user */
-      const { data: authData, error: authErr } = await sb.auth.signUp({
-        email: f.email.trim(),
-        password: f.password,
+      /* 2. Call server API — creates auth user + inserts profile with service_role
+            (bypasses RLS, so the "new row violates RLS" error never happens) */
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email:          f.email.trim(),
+          password:       f.password,
+          firstName:      f.firstName.trim(),
+          lastName:       f.lastName.trim(),
+          fatherName:     f.fatherName.trim(),
+          dob:            f.dob,
+          gender:         f.gender,
+          maritalStatus:  f.maritalStatus,
+          palId:          f.palId,
+          gotraId:        f.gotraId,
+          village:        f.village.trim(),
+          educationLevel: f.educationLevel,
+          educationField: f.educationField.trim(),
+          profession:     f.profession,
+          bloodGroup:     f.bloodGroup,
+          intro:          f.intro.trim(),
+          permAddr:       f.permAddr.trim(),
+          currAddr:       f.currAddr.trim(),
+          country:        f.country,
+          province:       f.province,
+          city:           f.city,
+          contact:        f.contact.trim(),
+          profilePicId:   uploadedPicId,
+          whatsapp:       f.whatsapp.trim(),
+          facebook:       f.facebook.trim(),
+          instagram:      f.instagram.trim(),
+          linkedin:       f.linkedin.trim(),
+          twitter:        f.twitter.trim(),
+        }),
       });
-      if (authErr) {
-        setErrors({ form: authErr.message });
-        return;
-      }
-      const userId = authData.user?.id;
-      if (!userId) {
-        setErrors({ form: 'Signup failed. Please try again.' });
+
+      const result = await res.json();
+      if (!res.ok) {
+        setErrors({ form: result.error ?? 'Signup failed. Please try again.' });
         return;
       }
 
-      /* 3. Insert profile record */
-      const palObj = PALS.find(p => String(p.id) === f.palId);
-      const { error: profileErr } = await sb.from('profiles').insert({
-        id:              userId,
-        first_name:      f.firstName.trim(),
-        last_name:       f.lastName.trim(),
-        father_name:     f.fatherName.trim(),
-        date_of_birth:   f.dob,
-        gender:          f.gender,
-        marital_status:  f.maritalStatus,
-        pal_id:          f.palId ? Number(f.palId) : null,
-        gotra_id:        f.gotraId ? Number(f.gotraId) : null,
-        pichla_gaoon:    f.village.trim() || null,
-        education_level: f.educationLevel || null,
-        education_field: f.educationField.trim() || null,
-        profession:      f.profession || null,
-        blood_group:     f.bloodGroup || null,
-        religion:        'Islam',
-        intro:           f.intro.trim() || null,
-        permanent_addr:  f.permAddr.trim(),
-        current_addr:    f.currAddr.trim() || null,
-        country:         f.country || null,
-        state_province:  f.province || null,
-        city:            f.city || null,
-        contact_no:       f.contact.trim() || null,
-        profile_pic_id:   uploadedPicId,
-        social_whatsapp:  f.whatsapp.trim()  || null,
-        social_facebook:  f.facebook.trim()  || null,
-        social_instagram: f.instagram.trim() || null,
-        social_linkedin:  f.linkedin.trim()  || null,
-        social_twitter:   f.twitter.trim()   || null,
-      });
-
-      if (profileErr) {
-        setErrors({ form: profileErr.message });
-        return;
-      }
+      /* 3. Auto-login so the user lands in an active session */
+      await getSupabase().auth.signInWithPassword({ email: f.email.trim(), password: f.password });
 
       setSuccess(true);
     } catch (err) {
