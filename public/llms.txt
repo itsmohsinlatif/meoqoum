@@ -1,0 +1,67 @@
+# Meo Qoum — Community Archive & Platform
+
+## What is this site?
+
+Meo Qoum (meoqoum.com) is an open community archive and cultural platform for the Meo people (میو قوم), an ethnic group indigenous to the Mewat region spanning Haryana and Rajasthan in India, with a large diaspora in Pakistan (Punjab and Sindh) and community members living across the world.
+
+The platform is maintained by volunteer editors and community members. Contributions in any of the three supported languages are welcome.
+
+## Languages
+
+- English (en)
+- Urdu / اردو (ur) — written right-to-left
+- Mewati / میواتی (mew) — written right-to-left, closely related to Urdu and Braj
+
+All URLs are prefixed with the locale: /en/, /ur/, /mew/
+
+## Sections
+
+- /[locale]/ — Home page with news highlights and photo gallery
+- /[locale]/history — History and origin of the Meo community
+- /[locale]/directory — Directory of the 13 Pals (clans) and 52 Gotras (sub-clans)
+- /[locale]/news — Community news, announcements, and long-form articles
+- /[locale]/library — Digital library: books, manuscripts, and PDFs in Urdu, English and Mewati
+- /[locale]/rishta — Marriage matchmaking directory for community members (login required for full access)
+- /[locale]/population — Interactive map of Mewati speakers across India and Pakistan, sourced from census data
+- /[locale]/join — Member registration form
+- /[locale]/login — Member login
+- /[locale]/forgot-password — Password reset
+- /[locale]/profile — Update profile and change password (authenticated)
+- /[locale]/admin — Admin panel (restricted to editors)
+
+## Community Data
+
+### The 13 Pals (Clans)
+Demrot, Poonglot, Balot, Ratwat, Sengal, Dulot, Nai, Lundawat, Chhirkalot, Dhengal, Kalisa, Dedwal, Pahat
+
+Each Pal belongs to one of three Vansh lineages: Surajvanshi-Jado, Chandravanshi-Chauhan, or Agnivanshi.
+
+### Mewati Speakers (Census Data)
+- India 2011 Census: 856,643 speakers (concentrated in Nuh/Mewat district, Haryana; Alwar and Bharatpur, Rajasthan)
+- Pakistan 2023 Census: 1,094,219 speakers (concentrated in Kasur, Lahore, and other Punjab districts)
+- Combined census total: ~1.95 million
+- Community estimate: ~5.8 million (community leaders claim actual numbers are 3× higher than census figures)
+
+### Historical Context
+The 1947 Partition of India displaced ~193,000 Meos who migrated to Pakistan. The Mewati language gained official recognition in Pakistan's 2023 census — 76 years after Partition.
+
+## Technical Stack
+
+- Framework: Next.js 16 (App Router, Turbopack)
+- i18n: next-intl v4 with locale-prefixed routing
+- Database: Supabase (PostgreSQL with Row Level Security)
+- Auth: Supabase Auth
+- Media: Cloudinary (images, PDF and ePub books)
+- Styling: CSS custom properties, inline styles, logical properties for RTL
+- Fonts: Noto Nastaliq Urdu (Arabic script), Cormorant Garamond (English display)
+
+## API Routes (server-side, not for crawling)
+
+- POST /api/signup — user registration (service_role, bypasses RLS)
+- GET|POST|DELETE /api/admin/books — book management (admin only)
+- GET|POST|DELETE /api/admin/articles — article management (admin only)
+
+## Robots / Crawling
+
+Public pages (/, /history, /directory, /news, /library, /population) are fully crawlable.
+Pages requiring auth (/rishta, /profile, /admin) should not be indexed.

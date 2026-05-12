@@ -202,9 +202,16 @@ function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
 
   const set = (k: keyof typeof BOOK_DEFAULTS, v: unknown) => setF(p => ({ ...p, [k]: v }));
 
+  const MAX_BYTES = 10 * 1024 * 1024; // 10 MB Cloudinary free limit
+
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_BYTES) {
+      setErr(`File is ${(file.size / 1024 / 1024).toFixed(1)} MB — Cloudinary free plan limit is 10 MB. Please compress the PDF or upgrade your Cloudinary plan.`);
+      e.target.value = '';
+      return;
+    }
     setFileUploading(true);
     try {
       const folder = f.source_type === 'epub_url' ? 'meoqoum/books/epub' : 'meoqoum/books/pdf';
@@ -362,6 +369,7 @@ function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
               {fileUploading ? 'Uploading…' : `↑ Upload ${f.source_type === 'epub_url' ? 'ePub' : 'PDF'}`}
             </Btn>
           </div>
+          <div style={{ fontSize: 11, color: A.mute, marginTop: 4 }}>Max 10 MB (Cloudinary free plan limit)</div>
         </div>
       )}
 

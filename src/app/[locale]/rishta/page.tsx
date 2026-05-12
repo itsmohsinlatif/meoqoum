@@ -39,11 +39,133 @@ function ageFrom(dob: string): number {
   return age;
 }
 
+/* ─── Profile detail modal ──────────────────────────────────────────────────── */
+function ProfileModal({
+  mp, locale, ff, ffH, dir, isLoggedIn, d, onClose,
+}: {
+  mp: MarriageProfile; locale: Locale; ff: string; ffH: string; dir: string;
+  isLoggedIn: boolean; d: typeof RISHTA; onClose: () => void;
+}) {
+  const p   = mp.profiles!;
+  const age = ageFrom(p.date_of_birth);
+  const palName   = p.pals?.name_en   ?? '—';
+  const gotraName = p.gotras?.name_en ?? '—';
+  const picSrc = isLoggedIn && p.profile_pic_id
+    ? cldUrl(p.profile_pic_id, { w: 400, h: 400, crop: 'fill' }) : null;
+  const eduLabel = EDUCATION_LEVELS.find(e => e.value === p.education_level)?.label ?? p.education_level ?? '—';
+  const countryName = COUNTRIES.find(c => c.code === p.country)?.name ?? p.country ?? '—';
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+
+  const row = (label: string, value: string) => (
+    <div key={label} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--rule)' }}>
+      <div style={{ minWidth: 110, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--gold-soft)', paddingTop: 1, fontFamily: 'var(--sans)' }}>{label}</div>
+      <div style={{ fontSize: 13, color: 'var(--ink)', fontFamily: ff }}>{value}</div>
+    </div>
+  );
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 1300, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)' }} />
+      <div dir={dir} style={{
+        position: 'fixed', zIndex: 1301,
+        top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: 'min(92vw, 620px)', maxHeight: '90vh',
+        background: '#fff', borderRadius: 6,
+        boxShadow: '0 24px 80px rgba(0,0,0,0.35)',
+        display: 'flex', flexDirection: 'column',
+        overflow: 'hidden',
+      }}>
+        {/* Header band */}
+        <div style={{
+          background: p.gender === 'male' ? 'var(--emerald-deep)' : 'linear-gradient(135deg,#5a2060,#3a1040)',
+          padding: '18px 22px',
+          display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0,
+        }}>
+          {/* Photo */}
+          <div style={{ width: 72, height: 72, borderRadius: '50%', overflow: 'hidden', background: 'rgba(255,255,255,0.15)', flexShrink: 0, position: 'relative' }}>
+            {picSrc
+              ? <Image src={picSrc} alt="" fill style={{ objectFit: 'cover' }} sizes="72px" />
+              : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>
+                  {isLoggedIn ? (p.gender === 'male' ? '👨' : '👩') : <span style={{ filter: 'blur(4px)' }}>👤</span>}
+                </div>
+            }
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: ffH, fontSize: 22, color: '#fff', lineHeight: 1.2, marginBottom: 3 }}>
+              {isLoggedIn ? `${p.first_name} ${p.last_name}` : <span style={{ filter: 'blur(5px)' }}>████ ████</span>}
+            </div>
+            <div style={{ fontFamily: ff, fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
+              {age} yrs · {palName} · {gotraName}
+            </div>
+            {mp.is_degree_verified && (
+              <div style={{ display: 'inline-block', marginTop: 5, background: 'var(--gold)', color: 'var(--emerald-deep)', fontSize: 10, fontWeight: 700, padding: '2px 8px', letterSpacing: '0.06em' }}>
+                {d.degreeVerified[locale]}
+              </div>
+            )}
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ overflow: 'auto', padding: '20px 22px', flex: 1 }}>
+          {/* Bio */}
+          {mp.bio && isLoggedIn && (
+            <p style={{ fontFamily: ff, fontSize: 14, lineHeight: 1.75, color: 'var(--ink-soft)', margin: '0 0 20px', padding: '14px 16px', background: 'var(--paper)', borderInlineStart: '3px solid var(--gold)' }}>
+              {mp.bio}
+            </p>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {row(locale === 'en' ? 'Education' : 'تعلیم', eduLabel)}
+            {row(locale === 'en' ? 'Field' : 'شعبہ', p.education_field ?? '—')}
+            {row(locale === 'en' ? 'Profession' : 'پیشہ', p.profession ?? '—')}
+            {row(locale === 'en' ? 'Country' : 'ملک', countryName)}
+            {isLoggedIn && row(locale === 'en' ? 'City' : 'شہر', p.city ?? '—')}
+            {row(locale === 'en' ? 'Marital Status' : 'ازدواجی حیثیت', p.marital_status)}
+            {isLoggedIn && p.contact_no && row(locale === 'en' ? 'Contact' : 'رابطہ', p.contact_no)}
+            {mp.height_cm && row(locale === 'en' ? 'Height' : 'قد', `${mp.height_cm} cm`)}
+            {mp.weight_kg && row(locale === 'en' ? 'Weight' : 'وزن', `${mp.weight_kg} kg`)}
+            {mp.complexion && row(locale === 'en' ? 'Complexion' : 'رنگ', mp.complexion)}
+            {(mp.pref_age_min || mp.pref_age_max) && row(locale === 'en' ? 'Preferred Age' : 'پسندیدہ عمر', `${mp.pref_age_min ?? 18}–${mp.pref_age_max ?? 50}`)}
+            {mp.pref_country && row(locale === 'en' ? 'Preferred Country' : 'پسندیدہ ملک', mp.pref_country)}
+            {mp.pref_notes && row(locale === 'en' ? 'Notes' : 'نوٹس', mp.pref_notes)}
+          </div>
+
+          {/* Social links */}
+          {isLoggedIn && (p.social_whatsapp || p.social_facebook || p.social_instagram || p.social_linkedin || p.social_twitter) && (
+            <div style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {p.social_whatsapp && <a href={`https://wa.me/${p.social_whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" title="WhatsApp" style={socialIcon('#25D366')}><WhatsAppIcon /></a>}
+              {p.social_facebook && <a href={p.social_facebook.startsWith('http') ? p.social_facebook : `https://facebook.com/${p.social_facebook}`} target="_blank" rel="noreferrer" title="Facebook" style={socialIcon('#1877F2')}><FbIcon /></a>}
+              {p.social_instagram && <a href={`https://instagram.com/${p.social_instagram.replace('@','')}`} target="_blank" rel="noreferrer" title="Instagram" style={socialIcon('#E1306C')}><IgIcon /></a>}
+              {p.social_linkedin && <a href={p.social_linkedin.startsWith('http') ? p.social_linkedin : `https://linkedin.com/in/${p.social_linkedin}`} target="_blank" rel="noreferrer" title="LinkedIn" style={socialIcon('#0A66C2')}><LiIcon /></a>}
+              {p.social_twitter && <a href={`https://x.com/${p.social_twitter.replace('@','')}`} target="_blank" rel="noreferrer" title="X / Twitter" style={socialIcon('#000')}><XIcon /></a>}
+            </div>
+          )}
+
+          {!isLoggedIn && (
+            <div style={{ marginTop: 20, padding: '14px 16px', background: 'var(--paper)', border: '1px dashed var(--gold)', fontFamily: ff, fontSize: 13, color: 'var(--ink-mute)', textAlign: 'center' }}>
+              {locale === 'en' ? 'Join Meo Qoum to see contact details, city and full profile.' : locale === 'ur' ? 'مکمل معلومات دیکھنے کے لیے ممبر بنیں۔' : 'پوری معلومات کے لیے ممبر بنو۔'}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ─── Profile card ──────────────────────────────────────────────────────────── */
 function ProfileCard({
-  mp, locale, ff, ffH, dir, isLoggedIn, d,
+  mp, locale, ff, ffH, dir, isLoggedIn, d, onExpand,
 }: {
-  mp: MarriageProfile; locale: Locale; ff: string; ffH: string; dir: string; isLoggedIn: boolean; d: typeof RISHTA;
+  mp: MarriageProfile; locale: Locale; ff: string; ffH: string; dir: string;
+  isLoggedIn: boolean; d: typeof RISHTA; onExpand: () => void;
 }) {
   const p = mp.profiles!;
   const age = ageFrom(p.date_of_birth);
@@ -58,7 +180,13 @@ function ProfileCard({
   const eduLabel = EDUCATION_LEVELS.find(e => e.value === p.education_level)?.label ?? p.education_level ?? '—';
 
   return (
-    <article className="mp-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <article
+      className="mp-card"
+      onClick={onExpand}
+      style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'transform .15s, box-shadow .15s' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0,40,20,0.13)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; (e.currentTarget as HTMLElement).style.boxShadow = ''; }}
+    >
       {/* Photo */}
       <div style={{
         height: 200, position: 'relative', overflow: 'hidden',
@@ -136,60 +264,18 @@ function ProfileCard({
           </p>
         )}
 
-        {isLoggedIn ? (
-          <>
-            {/* Social links */}
-            {(p.social_whatsapp || p.social_facebook || p.social_instagram || p.social_linkedin || p.social_twitter) && (
-              <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
-                {p.social_whatsapp && (
-                  <a href={`https://wa.me/${p.social_whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
-                    title="WhatsApp" style={socialIcon('#25D366')}>
-                    <WhatsAppIcon />
-                  </a>
-                )}
-                {p.social_facebook && (
-                  <a href={p.social_facebook.startsWith('http') ? p.social_facebook : `https://facebook.com/${p.social_facebook}`}
-                    target="_blank" rel="noreferrer" title="Facebook" style={socialIcon('#1877F2')}>
-                    <FbIcon />
-                  </a>
-                )}
-                {p.social_instagram && (
-                  <a href={`https://instagram.com/${p.social_instagram.replace('@','')}`}
-                    target="_blank" rel="noreferrer" title="Instagram" style={socialIcon('#E1306C')}>
-                    <IgIcon />
-                  </a>
-                )}
-                {p.social_linkedin && (
-                  <a href={p.social_linkedin.startsWith('http') ? p.social_linkedin : `https://linkedin.com/in/${p.social_linkedin}`}
-                    target="_blank" rel="noreferrer" title="LinkedIn" style={socialIcon('#0A66C2')}>
-                    <LiIcon />
-                  </a>
-                )}
-                {p.social_twitter && (
-                  <a href={`https://x.com/${p.social_twitter.replace('@','')}`}
-                    target="_blank" rel="noreferrer" title="X / Twitter" style={socialIcon('#000')}>
-                    <XIcon />
-                  </a>
-                )}
-              </div>
-            )}
-            <Link href={`/${locale}/rishta/${mp.id}`} style={{
-              marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6,
-              color: 'var(--emerald)', textDecoration: 'none',
-              fontSize: 12, fontWeight: 700,
-              letterSpacing: locale === 'en' ? '0.12em' : 0,
-              textTransform: locale === 'en' ? 'uppercase' : 'none',
-              fontFamily: ff,
-            }}>
-              {d.viewProfile[locale]}
-              <Arrow dir={dir === 'rtl' ? 'left' : 'right'} />
-            </Link>
-          </>
-        ) : (
-          <div style={{ marginTop: 16, fontSize: 12, color: 'var(--ink-mute)', fontFamily: ff, fontStyle: 'italic' }}>
-            {locale === 'en' ? 'Join to view full profile' : locale === 'ur' ? 'مکمل پروفائل کے لیے ممبر بنیں' : 'پوری پروفائل کے لیے ممبر بنو'}
-          </div>
-        )}
+        {/* Click-to-expand hint */}
+        <div style={{
+          marginTop: 'auto', paddingTop: 14,
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          color: 'var(--emerald)', fontSize: 12, fontWeight: 700,
+          letterSpacing: locale === 'en' ? '0.12em' : 0,
+          textTransform: locale === 'en' ? 'uppercase' : 'none',
+          fontFamily: ff,
+        }}>
+          {d.viewProfile[locale]}
+          <Arrow dir={dir === 'rtl' ? 'left' : 'right'} />
+        </div>
       </div>
     </article>
   );
@@ -212,6 +298,7 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
   const [loading,     setLoading]     = useState(true);
   const [myProfile,   setMyProfile]   = useState<{ id: string; is_active: boolean } | null | undefined>(undefined);
   const [toggling,    setToggling]    = useState(false);
+  const [expanded,    setExpanded]    = useState<MarriageProfile | null>(null);
 
   /* Filters */
   const [gender,     setGender]     = useState('');
@@ -583,6 +670,7 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
                     key={mp.id} mp={mp} locale={locale}
                     ff={ff} ffH={ffH} dir={dir}
                     isLoggedIn={Boolean(user)} d={d}
+                    onExpand={() => setExpanded(mp)}
                   />
                 ))}
               </div>
@@ -592,6 +680,15 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
       </section>
 
       <Footer locale={locale} />
+
+      {expanded && (
+        <ProfileModal
+          mp={expanded} locale={locale}
+          ff={ff} ffH={ffH} dir={dir}
+          isLoggedIn={Boolean(user)} d={d}
+          onClose={() => setExpanded(null)}
+        />
+      )}
 
       <style>{`
         @media (max-width: 700px) {

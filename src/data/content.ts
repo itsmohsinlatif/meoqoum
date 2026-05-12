@@ -577,7 +577,7 @@ export const RISHTA = {
 /* FOOTER */
 export const FOOTER = {
   about: {
-    en: 'Meo Qoum is an open community archive maintained by volunteer editors across Mewat, Karachi, Lahore, and the Gulf. Contributions in any of our three languages are welcome.',
+    en: 'Meo Qoum is an open community archive maintained by volunteer editors across Mewat, Karachi, Lahore, and wherever Meos live in the world. Contributions in any of our three languages are welcome.',
     ur: 'میو قوم ایک کھلا کمیونٹی آرکائیو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار مرتب کرتے ہیں۔ ہماری تینوں زبانوں میں شراکت کا خیر مقدم ہے۔',
     mew: 'میو قوم ایک کھلو سماج کو خزانو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار سنبھالاں ہاں۔ ہماری تیناں بولیاں میں حصہ ڈالنو خوش آمدید۔',
   } as L,
@@ -596,7 +596,7 @@ export const FOOTER = {
     { en: 'Translate an article',   ur: 'مضمون کا ترجمہ کریں', mew: 'لیکھ کو ترجمو کرو'  } as L,
   ],
   rights: {
-    en: '© 2026 Meo Qoum · Made with care across three borders',
+    en: '© 2026 Meo Qoum · Made with care, wherever Meos call home',
     ur: '© 2026 میو قوم · تین سرحدوں کے پار محبت سے بنایا گیا',
     mew: '© 2026 میو قوم · تیناں سرحداں کے پار محبت سوں بنایو',
   } as L,

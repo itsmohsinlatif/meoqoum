@@ -423,13 +423,12 @@ export default function BookReader({
               isRtl={isRtl}
             />
           ) : isPdf ? (
-            /* PDF: use Google Docs viewer as fallback for inline display */
-            <iframe
+            /* PDF: embed directly — browser's native viewer handles it */
+            <embed
               key={`${book.id}-${theme}`}
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(srcUrl)}&embedded=true`}
-              title={book.title.en}
-              style={iframeStyle}
-              allowFullScreen
+              src={srcUrl}
+              type="application/pdf"
+              style={{ ...iframeStyle, flex: 1 } as React.CSSProperties}
             />
           ) : (
             /* Archive.org or any other iframe source */

@@ -19,14 +19,23 @@ export default function Header({ active }: HeaderProps) {
   const router = useRouter();
   const dir = locale === 'en' ? 'ltr' : 'rtl';
   const ff  = locale === 'en' ? 'var(--sans)' : 'var(--urdu)';
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [user,       setUser]       = useState<User | null>(null);
+  const [firstName,  setFirstName]  = useState('');
 
   useEffect(() => {
     const sb = getSupabase();
-    sb.auth.getUser().then(({ data: { user: u } }) => setUser(u));
+
+    async function loadUser(u: User | null) {
+      setUser(u);
+      if (!u) { setFirstName(''); return; }
+      const { data } = await sb.from('profiles').select('first_name').eq('id', u.id).single();
+      setFirstName(data?.first_name ?? '');
+    }
+
+    sb.auth.getUser().then(({ data: { user: u } }) => loadUser(u));
     const { data: { subscription } } = sb.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null);
+      loadUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -86,10 +95,19 @@ export default function Header({ active }: HeaderProps) {
           <LangSwitcher />
 
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 11, color: 'var(--ink-mute)', fontFamily: ff, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {user.email}
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Link
+                href={`/${locale}/profile`}
+                style={{
+                  fontSize: 12, fontWeight: 600,
+                  color: 'var(--emerald)', fontFamily: ff,
+                  textDecoration: 'none',
+                  maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}
+                title={user.email ?? ''}
+              >
+                {firstName || user.email?.split('@')[0] || 'Profile'}
+              </Link>
               <button
                 onClick={handleLogout}
                 style={{

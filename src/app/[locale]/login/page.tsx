@@ -101,12 +101,17 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
               {loading ? '…' : d.loginBtn[locale]}
             </button>
 
-            <p style={{ fontFamily: ff, fontSize: 14, color: 'var(--ink-soft)', textAlign: 'center' }}>
-              {d.noAccount[locale]}{' '}
-              <Link href={`/${locale}/join`} style={{ color: 'var(--emerald)', fontWeight: 600 }}>
-                {d.joinLink[locale]}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+              <Link href={`/${locale}/forgot-password`} style={{ fontFamily: ff, fontSize: 13, color: 'var(--ink-mute)', textDecoration: 'underline' }}>
+                {locale === 'en' ? 'Forgot password?' : locale === 'ur' ? 'پاس ورڈ بھول گئے؟' : 'پاس ورڈ بھول گئے؟'}
               </Link>
-            </p>
+              <p style={{ fontFamily: ff, fontSize: 13, color: 'var(--ink-soft)', margin: 0 }}>
+                {d.noAccount[locale]}{' '}
+                <Link href={`/${locale}/join`} style={{ color: 'var(--emerald)', fontWeight: 600 }}>
+                  {d.joinLink[locale]}
+                </Link>
+              </p>
+            </div>
           </form>
         </div>
       </section>
