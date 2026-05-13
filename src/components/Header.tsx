@@ -203,8 +203,8 @@ export default function Header({ active }: HeaderProps) {
           ))}
         </nav>
 
-        {/* Right-side actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        {/* Right-side actions — hidden on mobile, shown in flyout instead */}
+        <div className="mp-header-actions">
           <LangSwitcher />
 
           {user ? (
@@ -282,48 +282,120 @@ export default function Header({ active }: HeaderProps) {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button className="mp-nav-toggle" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)}>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round"/>
-          </svg>
+        {/* Mobile hamburger — shows ☰ / ✕ */}
+        <button
+          className="mp-nav-toggle"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(v => !v)}
+        >
+          {menuOpen
+            ? <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M6 6l12 12M18 6l-12 12" strokeLinecap="round"/></svg>
+            : <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round"/></svg>
+          }
         </button>
       </div>
 
-      {/* Mobile active-page bar */}
-      <div className="mp-mobile-bar">
-        <span style={{ fontFamily: ff }}>{NAV[active][locale]}</span>
-        <LangSwitcher compact />
-      </div>
-
-      {/* Mobile flyout menu */}
+      {/* Mobile flyout — nav + lang + auth */}
       {menuOpen && (
         <div className="mp-mobile-menu" dir={dir}>
+
+          {/* Language switcher at the top */}
+          <div style={{
+            padding: '12px 0 16px',
+            borderBottom: '1px solid rgba(212,175,55,0.15)',
+            marginBottom: 4,
+          }}>
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 10, color: 'rgba(245,245,220,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Language
+            </div>
+            <LangSwitcher />
+          </div>
+
+          {/* Nav links */}
           {navKeys.map(k => (
             <Link key={k} href={navHref(k)} className={active === k ? 'active' : ''} style={{ fontFamily: ff }} onClick={() => setMenuOpen(false)}>
               {NAV[k][locale]}
             </Link>
           ))}
+
+          {/* Account section */}
           {user ? (
-            <>
+            <div style={{ borderTop: '1px solid rgba(212,175,55,0.15)', marginTop: 4, paddingTop: 4 }}>
+              {/* User info */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 0 14px',
+                borderBottom: '1px solid rgba(212,175,55,0.1)',
+                marginBottom: 4,
+              }}>
+                <Avatar firstName={firstName} picId={profilePic} size={36} />
+                <div>
+                  <div style={{ fontFamily: ff, fontSize: 14, fontWeight: 700, color: 'var(--cream)', lineHeight: 1.2 }}>
+                    {firstName || 'Member'}
+                  </div>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'rgba(245,245,220,0.5)', marginTop: 2 }}>
+                    {user.email}
+                  </div>
+                </div>
+              </div>
               <Link href={`/${locale}/profile`} style={{ fontFamily: ff }} onClick={() => setMenuOpen(false)}>
-                {T.profile[locale]}
+                👤 {T.profile[locale]}
               </Link>
               <Link href={`/${locale}/profile?tab=rishta`} style={{ fontFamily: ff }} onClick={() => setMenuOpen(false)}>
-                {T.rishta[locale]}
+                💍 {T.rishta[locale]}
               </Link>
-              <button onClick={() => { setMenuOpen(false); handleLogout(); }}
-                style={{ background: 'transparent', border: 0, fontFamily: ff, fontSize: 14, color: '#e53e3e', cursor: 'pointer', padding: '12px 20px', textAlign: dir === 'rtl' ? 'right' : 'left', width: '100%' }}>
-                {T.logout[locale]}
+              {ADMIN_EMAIL && user.email === ADMIN_EMAIL && (
+                <Link href={`/${locale}/admin`} style={{ fontFamily: ff }} onClick={() => setMenuOpen(false)}>
+                  ⚙️ {T.admin[locale]}
+                </Link>
+              )}
+              <button
+                onClick={() => { setMenuOpen(false); handleLogout(); }}
+                style={{
+                  background: 'transparent', border: 0, fontFamily: ff,
+                  fontSize: 14, color: '#f87171', cursor: 'pointer',
+                  padding: '12px 0', textAlign: dir === 'rtl' ? 'right' : 'left',
+                  width: '100%', display: 'block',
+                  borderTop: '1px solid rgba(212,175,55,0.1)',
+                  marginTop: 4,
+                }}>
+                ↩ {T.logout[locale]}
               </button>
-            </>
+            </div>
           ) : (
-            <>
-              <Link href={`/${locale}/login`} style={{ fontFamily: ff }} onClick={() => setMenuOpen(false)}>{T.login[locale]}</Link>
-              <Link href={`/${locale}/join`} style={{ fontFamily: ff, fontWeight: 700, color: 'var(--gold)' }} onClick={() => setMenuOpen(false)}>
+            <div style={{
+              borderTop: '1px solid rgba(212,175,55,0.15)',
+              marginTop: 4, paddingTop: 16,
+              display: 'flex', gap: 10, flexWrap: 'wrap',
+            }}>
+              <Link
+                href={`/${locale}/login`}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: ff, fontSize: 14, fontWeight: 600,
+                  color: 'var(--cream)', textDecoration: 'none',
+                  border: '1px solid rgba(212,175,55,0.4)',
+                  padding: '10px 20px', borderRadius: 4,
+                  flex: 1, textAlign: 'center', minWidth: 100,
+                }}
+              >
+                {T.login[locale]}
+              </Link>
+              <Link
+                href={`/${locale}/join`}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: ff, fontSize: 14, fontWeight: 700,
+                  color: 'var(--emerald-deep)', textDecoration: 'none',
+                  background: 'var(--gold)',
+                  padding: '10px 20px', borderRadius: 4,
+                  flex: 1, textAlign: 'center', minWidth: 100,
+                }}
+              >
                 {locale === 'en' ? 'Join Free' : locale === 'ur' ? 'مفت جڑیں' : 'مفت جڑو'}
               </Link>
-            </>
+            </div>
           )}
         </div>
       )}

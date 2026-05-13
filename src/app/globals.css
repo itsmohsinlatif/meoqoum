@@ -208,19 +208,23 @@ html, body {
 .mp-mobile-menu {
   background: var(--emerald-deep);
   border-top: 1px solid rgba(212,175,55,0.15);
-  padding: 8px 16px 16px;
+  padding: 8px 20px 24px;
+  max-height: calc(100dvh - 70px);
+  overflow-y: auto;
 }
 .mp-mobile-menu a {
   display: block;
-  padding: 12px 0;
+  padding: 13px 0;
   color: var(--cream);
   text-decoration: none;
   font-size: 15px;
   font-weight: 500;
   border-bottom: 1px solid rgba(212,175,55,0.1);
+  letter-spacing: 0.01em;
 }
 .mp-mobile-menu a.active { color: var(--gold); }
-.mp-mobile-menu a:last-child { border-bottom: none; }
+/* inside flyout the lang switcher can use full width */
+.mp-mobile-menu .mp-lang { border-radius: 8px; }
 
 /* ─── Footer ─── */
 .mp-footer {
@@ -436,11 +440,23 @@ html, body {
   font-family: var(--urdu);
 }
 
+/* Desktop-only right-side header actions */
+.mp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 /* Responsive header nav */
 @media (max-width: 768px) {
-  .mp-header-inner { padding: 14px 16px; }
+  .mp-header-inner { padding: 10px 16px; gap: 0; }
   .mp-nav { display: none; }
-  .mp-header-inner { flex-wrap: nowrap; }
+  .mp-header-actions { display: none; }
+  .mp-mobile-bar { display: none; }
+  .mp-brand-name { font-size: 18px; }
+  .mp-brand-name .urdu { font-size: 13px; }
+  .mp-brand { gap: 10px; }
 }
 @media (min-width: 769px) {
   .mp-nav-toggle { display: none; }
