@@ -230,8 +230,21 @@ const BOOK_DEFAULTS = {
   is_published: true,
 };
 
-function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
-  const [f, setF] = useState(BOOK_DEFAULTS);
+function BookForm({ token, onSaved, editItem, onCancel }: {
+  token: string; onSaved: () => void;
+  editItem?: DbBook | null; onCancel?: () => void;
+}) {
+  const isEdit = !!editItem;
+  const [f, setF] = useState(() => editItem ? {
+    title_en: editItem.title_en, title_ur: editItem.title_ur, title_mew: editItem.title_mew,
+    author: editItem.author, year: editItem.year?.toString() ?? '',
+    category: editItem.category, language: editItem.language,
+    description_en: editItem.description_en, description_ur: editItem.description_ur,
+    description_mew: editItem.description_mew,
+    cover_id: editItem.cover_id ?? '', cover_gradient: editItem.cover_gradient,
+    source_type: editItem.source_type, source_id: editItem.source_id,
+    is_published: editItem.is_published,
+  } : BOOK_DEFAULTS);
   const [lt, setLt]       = useState<LangTab>('en');
   const [saving, setSaving] = useState(false);
   const [err, setErr]       = useState('');
@@ -263,14 +276,15 @@ function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
   }
 
   async function save() {
-    if (!f.title_en || !f.author || !f.source_id) {
+    if (!f.title_en || !f.author || (!isEdit && !f.source_id)) {
       setErr('Title (EN), Author, and Source are required.'); return;
     }
     setSaving(true); setErr('');
+    const payload = { ...f, year: f.year ? Number(f.year) : null, ...(isEdit ? { id: editItem!.id } : {}) };
     const res = await fetch('/api/admin/books', {
-      method: 'POST',
+      method: isEdit ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...f, year: f.year ? Number(f.year) : null }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     setSaving(false);
@@ -283,7 +297,12 @@ function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <h3 style={{ color: A.accent, fontSize: 15, margin: 0 }}>Add New Book</h3>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h3 style={{ color: A.accent, fontSize: 15, margin: 0 }}>
+          {isEdit ? `✏ Edit Book — ${editItem!.title_en}` : 'Add New Book'}
+        </h3>
+        {onCancel && <Btn variant="ghost" onClick={onCancel} style={{ padding: '4px 12px', fontSize: 12 }}>✕ Cancel</Btn>}
+      </div>
 
       {/* Language tabs for multilingual fields */}
       <div>
@@ -414,7 +433,7 @@ function BookForm({ token, onSaved }: { token: string; onSaved: () => void }) {
       {err && <div style={{ color: A.danger, fontSize: 12, padding: '8px 12px', background: `${A.danger}15`, borderRadius: 4 }}>{err}</div>}
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <Btn onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save Book'}</Btn>
+        <Btn onClick={save} disabled={saving}>{saving ? 'Saving…' : isEdit ? 'Update Book' : 'Save Book'}</Btn>
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: A.mute, cursor: 'pointer' }}>
           <input type="checkbox" checked={f.is_published} onChange={e => set('is_published', e.target.checked)} style={{ accentColor: A.accent }} />
           Published immediately
@@ -433,8 +452,19 @@ const ART_DEFAULTS = {
   cover_id: '', read_min: '', is_pinned: false, is_published: true,
 };
 
-function ArticleForm({ token, onSaved }: { token: string; onSaved: () => void }) {
-  const [f, setF]         = useState(ART_DEFAULTS);
+function ArticleForm({ token, onSaved, editItem, onCancel }: {
+  token: string; onSaved: () => void;
+  editItem?: DbArticle | null; onCancel?: () => void;
+}) {
+  const isEdit = !!editItem;
+  const [f, setF] = useState(() => editItem ? {
+    title_en: editItem.title_en, title_ur: editItem.title_ur, title_mew: editItem.title_mew,
+    excerpt_en: editItem.excerpt_en, excerpt_ur: editItem.excerpt_ur, excerpt_mew: editItem.excerpt_mew,
+    body_en: editItem.body_en, body_ur: editItem.body_ur, body_mew: editItem.body_mew,
+    category: editItem.category, author: editItem.author,
+    cover_id: editItem.cover_id ?? '', read_min: editItem.read_min?.toString() ?? '',
+    is_pinned: editItem.is_pinned, is_published: editItem.is_published,
+  } : ART_DEFAULTS);
   const [lt, setLt]       = useState<LangTab>('en');
   const [saving, setSaving] = useState(false);
   const [err, setErr]       = useState('');
@@ -446,10 +476,11 @@ function ArticleForm({ token, onSaved }: { token: string; onSaved: () => void })
       setErr('Title (EN) and Author are required.'); return;
     }
     setSaving(true); setErr('');
+    const payload = { ...f, read_min: f.read_min ? Number(f.read_min) : null, ...(isEdit ? { id: editItem!.id } : {}) };
     const res = await fetch('/api/admin/articles', {
-      method: 'POST',
+      method: isEdit ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...f, read_min: f.read_min ? Number(f.read_min) : null }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     setSaving(false);
@@ -462,7 +493,12 @@ function ArticleForm({ token, onSaved }: { token: string; onSaved: () => void })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <h3 style={{ color: A.accent, fontSize: 15, margin: 0 }}>Add New Article</h3>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h3 style={{ color: A.accent, fontSize: 15, margin: 0 }}>
+          {isEdit ? `✏ Edit Article — ${editItem!.title_en}` : 'Add New Article'}
+        </h3>
+        {onCancel && <Btn variant="ghost" onClick={onCancel} style={{ padding: '4px 12px', fontSize: 12 }}>✕ Cancel</Btn>}
+      </div>
 
       {/* Language tabs */}
       <div>
@@ -536,7 +572,7 @@ function ArticleForm({ token, onSaved }: { token: string; onSaved: () => void })
       {err && <div style={{ color: A.danger, fontSize: 12, padding: '8px 12px', background: `${A.danger}15`, borderRadius: 4 }}>{err}</div>}
 
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <Btn onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Publish Article'}</Btn>
+        <Btn onClick={save} disabled={saving}>{saving ? 'Saving…' : isEdit ? 'Update Article' : 'Publish Article'}</Btn>
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: A.mute, cursor: 'pointer' }}>
           <input type="checkbox" checked={f.is_pinned} onChange={e => set('is_pinned', e.target.checked)} style={{ accentColor: A.gold }} />
           Pin to Community Board
@@ -551,7 +587,9 @@ function ArticleForm({ token, onSaved }: { token: string; onSaved: () => void })
 }
 
 /* ── Item list rows ───────────────────────────────────────── */
-function BookRow({ book, token, onDelete }: { book: DbBook; token: string; onDelete: () => void }) {
+function BookRow({ book, token, onDelete, onEdit }: {
+  book: DbBook; token: string; onDelete: () => void; onEdit: (b: DbBook) => void;
+}) {
   const [busy, setBusy] = useState(false);
 
   async function del() {
@@ -581,15 +619,20 @@ function BookRow({ book, token, onDelete }: { book: DbBook; token: string; onDel
         </span>
       </td>
       <td style={{ padding: '10px 12px' }}>
-        <Btn variant="danger" onClick={del} disabled={busy} style={{ padding: '5px 12px', fontSize: 12 }}>
-          {busy ? '…' : 'Delete'}
-        </Btn>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <Btn variant="ghost" onClick={() => onEdit(book)} style={{ padding: '5px 10px', fontSize: 12 }}>✏ Edit</Btn>
+          <Btn variant="danger" onClick={del} disabled={busy} style={{ padding: '5px 12px', fontSize: 12 }}>
+            {busy ? '…' : 'Delete'}
+          </Btn>
+        </div>
       </td>
     </tr>
   );
 }
 
-function ArticleRow({ art, token, onDelete }: { art: DbArticle; token: string; onDelete: () => void }) {
+function ArticleRow({ art, token, onDelete, onEdit }: {
+  art: DbArticle; token: string; onDelete: () => void; onEdit: (a: DbArticle) => void;
+}) {
   const [busy, setBusy] = useState(false);
 
   async function del() {
@@ -622,9 +665,12 @@ function ArticleRow({ art, token, onDelete }: { art: DbArticle; token: string; o
         </span>
       </td>
       <td style={{ padding: '10px 12px' }}>
-        <Btn variant="danger" onClick={del} disabled={busy} style={{ padding: '5px 12px', fontSize: 12 }}>
-          {busy ? '…' : 'Delete'}
-        </Btn>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <Btn variant="ghost" onClick={() => onEdit(art)} style={{ padding: '5px 10px', fontSize: 12 }}>✏ Edit</Btn>
+          <Btn variant="danger" onClick={del} disabled={busy} style={{ padding: '5px 12px', fontSize: 12 }}>
+            {busy ? '…' : 'Delete'}
+          </Btn>
+        </div>
       </td>
     </tr>
   );
@@ -633,24 +679,58 @@ function ArticleRow({ art, token, onDelete }: { art: DbArticle; token: string; o
 /* ── User Profile Drawer ─────────────────────────────────── */
 function UserDrawer({
   userId, token, locale, onClose,
-  onVerify, onAmend,
+  onVerify, onAmend, onDeleted,
 }: {
   userId: string; token: string; locale: string;
   onClose: () => void;
   onVerify: (marriageProfileId: string) => void;
   onAmend: (marriageProfileId: string) => void;
+  onDeleted: () => void;
 }) {
   const [fu, setFu] = useState<FullUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editF, setEditF] = useState({ first_name: '', last_name: '', country: '', city: '', is_active: true });
+  const [saving, setSaving] = useState(false);
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
   useEffect(() => {
     setLoading(true);
     fetch(`/api/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(d => { setFu(d.user ?? null); setLoading(false); })
+      .then(d => {
+        const u = d.user ?? null;
+        setFu(u);
+        if (u) setEditF({ first_name: u.first_name, last_name: u.last_name, country: u.country ?? '', city: u.city ?? '', is_active: u.is_active ?? true });
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [userId, token]);
+
+  async function saveEdit() {
+    if (!fu) return;
+    setSaving(true);
+    await fetch('/api/admin/users', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action: 'edit_profile', profile_id: fu.id, ...editF }),
+    });
+    setSaving(false);
+    setEditing(false);
+    setFu(prev => prev ? { ...prev, ...editF } : prev);
+  }
+
+  async function deleteUser() {
+    if (!fu) return;
+    if (!confirm(`Permanently delete ${fu.first_name} ${fu.last_name}? This cannot be undone.`)) return;
+    await fetch('/api/admin/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id: fu.id }),
+    });
+    onClose();
+    onDeleted();
+  }
 
   const mp = fu?.marriage_profile;
   const pdfUrl = mp?.degree_doc_id
@@ -717,26 +797,63 @@ function UserDrawer({
             <>
               {/* ── Basic profile ── */}
               <section style={{ background: A.bg, borderRadius: 6, padding: 16, border: `1px solid ${A.border}` }}>
-                <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.mute, marginBottom: 12 }}>
-                  Basic Info
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.mute }}>Basic Info</div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {!editing && <Btn variant="ghost" onClick={() => setEditing(true)} style={{ padding: '3px 10px', fontSize: 11 }}>✏ Edit</Btn>}
+                    <Btn variant="danger" onClick={deleteUser} style={{ padding: '3px 10px', fontSize: 11 }}>🗑 Delete</Btn>
+                  </div>
                 </div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: A.text, marginBottom: 4 }}>
-                  {fu.first_name} {fu.last_name}
-                  {fu.is_verified && <span style={{ marginInlineStart: 8, fontSize: 11, color: A.accent }}>✓ Verified</span>}
-                </div>
-                <div style={{ fontSize: 12, color: A.mute, marginBottom: 12 }}>{fu.email}</div>
-                <Row label="Gender" value={fu.gender} />
-                <Row label="Location" value={[fu.city, fu.country].filter(Boolean).join(', ')} />
-                <Row label="Member since" value={new Date(fu.created_at).toLocaleDateString()} />
-                <div style={{ marginTop: 10 }}>
-                  <a
-                    href={`/${locale}/rishta`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize: 12, color: A.gold, textDecoration: 'none' }}
-                  >
-                    View public rishta directory →
-                  </a>
-                </div>
+
+                {editing ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: A.mute, marginBottom: 3 }}>First Name</div>
+                        <Input value={editF.first_name} onChange={e => setEditF(p => ({ ...p, first_name: e.target.value }))} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10, color: A.mute, marginBottom: 3 }}>Last Name</div>
+                        <Input value={editF.last_name} onChange={e => setEditF(p => ({ ...p, last_name: e.target.value }))} />
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: A.mute, marginBottom: 3 }}>Country</div>
+                        <Input value={editF.country} onChange={e => setEditF(p => ({ ...p, country: e.target.value }))} placeholder="Pakistan" />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10, color: A.mute, marginBottom: 3 }}>City</div>
+                        <Input value={editF.city} onChange={e => setEditF(p => ({ ...p, city: e.target.value }))} placeholder="Mewat" />
+                      </div>
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: A.mute, cursor: 'pointer' }}>
+                      <input type="checkbox" checked={editF.is_active} onChange={e => setEditF(p => ({ ...p, is_active: e.target.checked }))} style={{ accentColor: A.accent }} />
+                      Account active
+                    </label>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Btn onClick={saveEdit} disabled={saving} style={{ flex: 1 }}>{saving ? 'Saving…' : 'Save Changes'}</Btn>
+                      <Btn variant="ghost" onClick={() => setEditing(false)}>Cancel</Btn>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: A.text, marginBottom: 4 }}>
+                      {fu.first_name} {fu.last_name}
+                      {fu.is_verified && <span style={{ marginInlineStart: 8, fontSize: 11, color: A.accent }}>✓ Verified</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: A.mute, marginBottom: 12 }}>{fu.email}</div>
+                    <Row label="Gender" value={fu.gender} />
+                    <Row label="Location" value={[fu.city, fu.country].filter(Boolean).join(', ')} />
+                    <Row label="Member since" value={new Date(fu.created_at).toLocaleDateString()} />
+                    <div style={{ marginTop: 10 }}>
+                      <a href={`/${locale}/rishta`} target="_blank" rel="noopener noreferrer"
+                        style={{ fontSize: 12, color: A.gold, textDecoration: 'none' }}>
+                        View public rishta directory →
+                      </a>
+                    </div>
+                  </>
+                )}
               </section>
 
               {/* ── Rishta profile ── */}
@@ -983,22 +1100,30 @@ export default function AdminPage({
               {tab === 'books' ? '📚 Books' : tab === 'articles' ? '📰 Articles' : tab === 'users' ? '👥 Members' : '🎓 Degree Verification'}
             </h2>
             {(tab === 'books' || tab === 'articles') && (
-              <Btn onClick={() => setShowForm(v => !v)}>
-                {showForm ? '✕ Close Form' : `+ Add ${tab === 'books' ? 'Book' : 'Article'}`}
+              <Btn onClick={() => { setShowForm(v => !v); setEditItem(null); }}>
+                {showForm && !editItem ? '✕ Close Form' : `+ Add ${tab === 'books' ? 'Book' : 'Article'}`}
               </Btn>
             )}
           </div>
 
-          {/* Upload form */}
-          {showForm && (
+          {/* Add / Edit form */}
+          {(showForm || editItem) && (tab === 'books' || tab === 'articles') && (
             <div style={{
-              background: A.panel, border: `1px solid ${A.border}`,
+              background: A.panel, border: `1px solid ${editItem ? A.gold : A.border}`,
               borderRadius: 6, padding: 'clamp(16px,2vw,28px)',
               marginBottom: 28,
             }}>
               {tab === 'books'
-                ? <BookForm token={token} onSaved={() => { loadBooks(); setShowForm(false); }} />
-                : <ArticleForm token={token} onSaved={() => { loadArticles(); setShowForm(false); }} />
+                ? <BookForm token={token}
+                    editItem={editItem as DbBook | null}
+                    onSaved={() => { loadBooks(); setShowForm(false); setEditItem(null); }}
+                    onCancel={() => { setShowForm(false); setEditItem(null); }}
+                  />
+                : <ArticleForm token={token}
+                    editItem={editItem as DbArticle | null}
+                    onSaved={() => { loadArticles(); setShowForm(false); setEditItem(null); }}
+                    onCancel={() => { setShowForm(false); setEditItem(null); }}
+                  />
               }
             </div>
           )}
@@ -1021,7 +1146,7 @@ export default function AdminPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {books.map(b => <BookRow key={b.id} book={b} token={token} onDelete={loadBooks} />)}
+                      {books.map(b => <BookRow key={b.id} book={b} token={token} onDelete={loadBooks} onEdit={item => { setEditItem(item); setShowForm(false); }} />)}
                     </tbody>
                   </table>
                 )
@@ -1126,6 +1251,14 @@ export default function AdminPage({
                               }}>
                               ⚠ Request Amendment
                             </Btn>
+                            <Btn variant="ghost" style={{ padding: '7px 14px', fontSize: 12 }}
+                              onClick={async () => {
+                                if (!confirm('Remove this degree document? The user will need to re-upload.')) return;
+                                await fetch('/api/admin/degrees', { method: 'DELETE', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ id: d.id }) });
+                                loadDegrees();
+                              }}>
+                              🗑 Remove Doc
+                            </Btn>
                           </div>
                         </div>
                       </div>
@@ -1145,7 +1278,7 @@ export default function AdminPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {articles.map(a => <ArticleRow key={a.id} art={a} token={token} onDelete={loadArticles} />)}
+                      {articles.map(a => <ArticleRow key={a.id} art={a} token={token} onDelete={loadArticles} onEdit={item => { setEditItem(item); setShowForm(false); }} />)}
                     </tbody>
                   </table>
                 )
@@ -1175,6 +1308,7 @@ export default function AdminPage({
           token={token}
           locale={locale}
           onClose={() => setDrawerUserId(null)}
+          onDeleted={() => { setDrawerUserId(null); loadUsers(); }}
           onVerify={async (marriageProfileId) => {
             await fetch('/api/admin/degrees', {
               method: 'PATCH',

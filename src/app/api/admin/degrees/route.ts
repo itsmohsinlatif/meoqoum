@@ -57,3 +57,22 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
 }
+
+export async function DELETE(req: NextRequest) {
+  const user = await verifyAdmin(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await req.json();
+  const admin = getAdmin();
+
+  const { error } = await admin.from('marriage_profiles').update({
+    degree_doc_id:      null,
+    degree_type:        null,
+    is_degree_verified: false,
+    degree_status:      'pending',
+    degree_note:        null,
+  }).eq('id', id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}

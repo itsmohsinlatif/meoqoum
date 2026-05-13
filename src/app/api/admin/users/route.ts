@@ -36,7 +36,6 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
   const admin = getAdmin();
 
-  /* Toggle is_verified on a profile */
   if (body.action === 'toggle_verified') {
     const { error } = await admin.from('profiles')
       .update({ is_verified: body.value })
@@ -45,5 +44,30 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
+  if (body.action === 'edit_profile') {
+    const { error } = await admin.from('profiles').update({
+      first_name: body.first_name,
+      last_name:  body.last_name,
+      country:    body.country    || null,
+      city:       body.city       || null,
+      is_active:  body.is_active  ?? true,
+    }).eq('id', body.profile_id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+}
+
+export async function DELETE(req: NextRequest) {
+  const user = await verifyAdmin(req);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await req.json();
+  const admin = getAdmin();
+
+  /* Delete auth user (cascades to profiles via FK) */
+  const { error } = await admin.auth.admin.deleteUser(id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
 }
