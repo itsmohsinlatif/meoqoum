@@ -269,6 +269,194 @@ export default function PopulationPage({
             ⚠️ {d.estimateNote[locale]}
           </div>
 
+          {/* ── Genetic Origins ─────────────────────── */}
+          <div style={{
+            marginTop: 48,
+            paddingTop: 40,
+            borderTop: '2px solid #e8e0d0',
+          }}>
+            {/* Section header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, flexWrap: 'wrap' }}>
+              <div style={{
+                background: 'var(--emerald-deep)',
+                color: 'var(--gold)',
+                fontFamily: 'var(--serif)',
+                fontSize: 22,
+                fontWeight: 800,
+                padding: '6px 16px',
+                borderRadius: 4,
+                letterSpacing: '0.04em',
+              }}>
+                R1a1
+              </div>
+              <h2 style={{
+                fontFamily: ffH,
+                fontSize: 'clamp(20px,2vw,26px)',
+                color: 'var(--emerald-deep)',
+                margin: 0,
+                lineHeight: 1.2,
+              }}>
+                {locale === 'en' ? 'Genetic Origins' : locale === 'ur' ? 'نسلی اصل و تاریخ' : 'نسلی اصل و تواریخ'}
+              </h2>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'clamp(20px,3vw,40px)',
+            }}>
+              {/* Left: genetic narrative */}
+              <div>
+                <p style={{
+                  fontFamily: ff, fontSize: 'clamp(13px,1.1vw,15px)',
+                  color: '#3a3a2a', lineHeight: 1.85, marginBottom: 20,
+                }}>
+                  {locale === 'en'
+                    ? 'DNA studies place the Meo tribe within Haplogroup R1a1 — identified by the genetic marker M17. This ancient lineage traces to a population on the Eurasian steppes (present-day Ukraine and southern Russia) approximately 10,000–15,000 years ago. Their descendants spread across Europe, Central Asia, and South Asia, carrying the Indo-European language family, the domestication of horses, and this shared marker.'
+                    : locale === 'ur'
+                    ? 'ڈی این اے تحقیق کے مطابق میو قبیلہ ہیپلوگروپ R1a1 میں آتا ہے — جسے جینیاتی نشان M17 سے پہچانا جاتا ہے۔ یہ قدیم نسل تقریباً ۱۰,۰۰۰–۱۵,۰۰۰ سال پہلے یوریشین میدانوں (موجودہ یوکرین اور جنوبی روس) کی ایک آبادی سے جڑی ہے۔ ان کی نسل یورپ، وسطی ایشیا اور جنوبی ایشیا میں پھیلی، ہند-یورپی زبانوں اور گھوڑوں کو پالتو بنانے کا علم ساتھ لائی۔'
+                    : 'ڈی این اے تحقیق کے مطابق میو قوم ہیپلوگروپ R1a1 میں آوے ہے — M17 نشان سے پہچانو جاوے ہے۔ یہ پرانی نسل تقریباً ۱۰,۰۰۰–۱۵,۰۰۰ سال پہلے یوریشین میدانوں سوں آئی ہے۔'}
+                </p>
+
+                {/* Two key stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {[
+                    {
+                      pct: '40%',
+                      label: locale === 'en' ? 'of men from Czech Republic to Siberia carry M17' : 'چیک ری پبلک سے سائبیریا تک مردوں میں M17',
+                    },
+                    {
+                      pct: '35%',
+                      label: locale === 'en' ? 'of Urdu/Hindi-speaking populations carry M17' : 'اردو/ہندی بولنے والی آبادی میں M17',
+                    },
+                  ].map(s => (
+                    <div key={s.pct} style={{
+                      background: '#fff',
+                      border: '1.5px solid var(--gold)',
+                      borderTop: '4px solid var(--gold)',
+                      borderRadius: 4,
+                      padding: '14px 16px',
+                    }}>
+                      <div style={{
+                        fontFamily: 'var(--serif)',
+                        fontSize: 32, fontWeight: 800,
+                        color: 'var(--gold)', lineHeight: 1,
+                        marginBottom: 6,
+                      }}>
+                        {s.pct}
+                      </div>
+                      <div style={{ fontFamily: ff, fontSize: 11, color: '#555', lineHeight: 1.5 }}>
+                        {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{
+                  fontFamily: ff, fontSize: 12, color: '#888',
+                  marginTop: 16, lineHeight: 1.7,
+                }}>
+                  {locale === 'en'
+                    ? 'These figures show that the Meo genetic lineage connects them to a shared ancestral wave responsible for populating vast stretches of Eurasia — from Central Europe to the Indian subcontinent.'
+                    : 'یہ اعداد و شمار ظاہر کرتے ہیں کہ میو نسل ایک قدیم آبادیاتی لہر سے جڑی ہے جس نے وسطی یورپ سے برصغیر تک بڑے علاقوں کو آباد کیا۔'}
+                </p>
+              </div>
+
+              {/* Right: community structure */}
+              <div>
+                <h3 style={{
+                  fontFamily: ffH,
+                  fontSize: 'clamp(16px,1.5vw,20px)',
+                  color: 'var(--emerald-deep)',
+                  marginBottom: 16, lineHeight: 1.3,
+                }}>
+                  {locale === 'en' ? 'Community Structure' : locale === 'ur' ? 'قبائلی ڈھانچہ' : 'قبائلی ڈھانچو'}
+                </h3>
+                <p style={{
+                  fontFamily: ff, fontSize: 'clamp(13px,1.1vw,14px)',
+                  color: '#3a3a2a', lineHeight: 1.85, marginBottom: 16,
+                }}>
+                  {locale === 'en'
+                    ? 'The Meo community is traditionally divided into two main groups: the Paliya Meos and the Nepaliya Meos. The Paliya Meos are further organised into five ancestral clans (Bans), each tracing lineage through a common patrilineal ancestor.'
+                    : locale === 'ur'
+                    ? 'میو برادری روایتی طور پر دو بڑے گروہوں میں تقسیم ہے: پالیہ میو اور نیپالیہ میو۔ پالیہ میو مزید پانچ آبائی قبیلوں (بانس) میں منظم ہیں، جن میں سے ہر ایک مشترک نسبی آبا سے جڑا ہے۔'
+                    : 'میو برادری دو بڑے گروہاں میں بٹی ہے: پالیہ میو اور نیپالیہ میو۔ پالیہ میو پانچ آبائی بانساں میں بٹے ہیں۔'}
+                </p>
+
+                {/* Division cards */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {[
+                    {
+                      name: locale === 'en' ? 'Paliya Meos' : 'پالیہ میو',
+                      detail: locale === 'en' ? '5 ancestral Bans (clans)' : '۵ آبائی بانس (قبائل)',
+                      color: PAKISTAN,
+                    },
+                    {
+                      name: locale === 'en' ? 'Nepaliya Meos' : 'نیپالیہ میو',
+                      detail: locale === 'en' ? 'Separate lineage group' : 'الگ نسلی گروہ',
+                      color: INDIA,
+                    },
+                  ].map(d => (
+                    <div key={d.name} style={{
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      background: '#fff',
+                      border: `1.5px solid ${d.color}33`,
+                      borderInlineStart: `4px solid ${d.color}`,
+                      padding: '12px 16px', borderRadius: '0 4px 4px 0',
+                    }}>
+                      <div>
+                        <div style={{ fontFamily: ff, fontSize: 14, fontWeight: 700, color: d.color }}>
+                          {d.name}
+                        </div>
+                        <div style={{ fontFamily: ff, fontSize: 11, color: '#888', marginTop: 2 }}>
+                          {d.detail}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total population note */}
+                <div style={{
+                  marginTop: 20,
+                  background: 'var(--emerald-deep)',
+                  padding: '14px 18px', borderRadius: 4,
+                  display: 'flex', alignItems: 'center', gap: 16,
+                }}>
+                  <div style={{
+                    fontFamily: 'var(--serif)', fontSize: 30, fontWeight: 800,
+                    color: 'var(--gold)', lineHeight: 1, flexShrink: 0,
+                  }}>
+                    ~10M
+                  </div>
+                  <div style={{ fontFamily: ff, fontSize: 12, color: 'rgba(245,245,220,0.75)', lineHeight: 1.6 }}>
+                    {locale === 'en'
+                      ? 'Total Meo ethnic population (community DNA project estimate, both countries combined)'
+                      : 'کل میو نسلی آبادی (کمیونٹی ڈی این اے منصوبے کا تخمینہ، دونوں ممالک ملا کر)'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Source attribution */}
+            <p style={{
+              fontFamily: 'var(--sans)', fontSize: 11, color: '#aaa',
+              marginTop: 20, lineHeight: 1.7,
+            }}>
+              {locale === 'en' ? 'Source: ' : 'ماخذ: '}
+              <a
+                href="https://www.familytreedna.com/groups/meo/about/background"
+                target="_blank" rel="noopener noreferrer"
+                style={{ color: '#888', textDecoration: 'underline' }}
+              >
+                FamilyTreeDNA — Meo Tribe DNA Project (familytreedna.com/groups/meo/about/background)
+              </a>
+              {locale === 'en'
+                ? '. Haplogroup data based on project administrator Karamat Ullah Khan Meo\'s research.'
+                : '۔ ہیپلوگروپ ڈیٹا پراجیکٹ ایڈمنسٹریٹر کرامت اللہ خان میو کی تحقیق پر مبنی ہے۔'}
+            </p>
+          </div>
+
           {/* ── City breakdown tabs ─────────────────── */}
           <div style={{ marginTop: 40 }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>

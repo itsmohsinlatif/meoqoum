@@ -50,32 +50,62 @@ export const RajputBorder = ({ height = 22, color = '#D4AF37', bg = '#004225' })
   </svg>
 );
 
-/* Mewati Safa (turban) — the traditional white pagri of the Meo community.
-   Layered arcs represent the wound fabric; the tail hangs on the right. */
+/* Mewati Safa (white pagri) — faithful to the traditional Meo turban:
+   diagonal wound folds across a dome, with a pleated fan (shikra) at top-right. */
 export const BrandMark = ({ size = 44 }) => (
-  <svg viewBox="0 0 64 64" width={size} height={size}>
-    {/* Background circle */}
-    <circle cx="32" cy="32" r="30" fill="#004225" stroke="#D4AF37" strokeWidth="1.5"/>
+  <svg viewBox="0 0 64 64" width={size} height={size} aria-label="Meo Qoum">
+    <defs>
+      {/* Clip fold lines to the dome shape */}
+      <clipPath id="bm-dome">
+        <path d="M 12 47 C 10 36 11 24 19 17 C 24 12 31 11 31 11 C 31 11 43 11 48 23 C 53 33 51 47 51 47 Z" />
+      </clipPath>
+    </defs>
 
-    {/* Turban dome — uppermost part of the safa */}
-    <ellipse cx="32" cy="22" rx="14" ry="8" fill="#D4AF37"/>
+    {/* Emerald background */}
+    <circle cx="32" cy="32" r="30" fill="#004225" />
 
-    {/* Wound fabric layers — each arc is one wrap of the safa */}
-    <path d="M 16 28 Q 32 23 48 28" stroke="#D4AF37" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-    <path d="M 17 33 Q 32 28 47 33" stroke="#F5F5DC" strokeWidth="3" fill="none" strokeLinecap="round"/>
-    <path d="M 18 37.5 Q 32 33 46 37.5" stroke="#D4AF37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* ── Turban dome body ── */}
+    <path d="M 12 47 C 10 36 11 24 19 17 C 24 12 31 11 31 11 C 31 11 43 11 48 23 C 53 33 51 47 51 47 Z"
+      fill="#e4e1db" />
 
-    {/* Rim band at base of turban */}
-    <path d="M 17 41 Q 32 38 47 41" stroke="#c9a430" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    {/* Diagonal wound-fabric fold lines, clipped to dome */}
+    <g clipPath="url(#bm-dome)" stroke="#8c8986" strokeWidth="2.2">
+      <line x1="1"  y1="54" x2="35" y2="7"  />
+      <line x1="10" y1="56" x2="44" y2="8"  />
+      <line x1="19" y1="56" x2="53" y2="10" />
+      <line x1="28" y1="56" x2="61" y2="12" />
+      <line x1="36" y1="56" x2="67" y2="14" />
+    </g>
 
-    {/* Hanging tail — pallu of the safa draped on the right */}
-    <path d="M 47 31 Q 54 38 51 48" stroke="#D4AF37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    {/* ── Fan / shikra — pleated crest at top-right ── */}
+    {/* Alternating light/dark wedge segments radiating from (45, 25) */}
+    <path d="M 45 25 L 37 10 L 40 9  Z" fill="#ccc8c2" />
+    <path d="M 45 25 L 40 9  L 43 8  Z" fill="#e4e1db" />
+    <path d="M 45 25 L 43 8  L 47 8  Z" fill="#ccc8c2" />
+    <path d="M 45 25 L 47 8  L 50 9  Z" fill="#e4e1db" />
+    <path d="M 45 25 L 50 9  L 53 12 Z" fill="#ccc8c2" />
+    <path d="M 45 25 L 53 12 L 55 16 Z" fill="#e4e1db" />
+    <path d="M 45 25 L 55 16 L 55 21 Z" fill="#ccc8c2" />
+    {/* Divider lines between fan segments */}
+    <g stroke="#8c8986" strokeWidth="0.9" strokeLinecap="round">
+      <line x1="45" y1="25" x2="37" y2="10" />
+      <line x1="45" y1="25" x2="40" y2="9"  />
+      <line x1="45" y1="25" x2="43" y2="8"  />
+      <line x1="45" y1="25" x2="47" y2="8"  />
+      <line x1="45" y1="25" x2="50" y2="9"  />
+      <line x1="45" y1="25" x2="53" y2="12" />
+      <line x1="45" y1="25" x2="55" y2="16" />
+      <line x1="45" y1="25" x2="55" y2="21" />
+    </g>
 
-    {/* Urdu م ق centred on the turban dome */}
-    <text x="32" y="26" textAnchor="middle" fontSize="8"
-      fontFamily="Noto Nastaliq Urdu, serif" fontWeight="700" fill="#004225">
+    {/* ── Urdu م ق on dome ── */}
+    <text x="27" y="37" textAnchor="middle" fontSize="9"
+      fontFamily="Noto Nastaliq Urdu, serif" fontWeight="700" fill="#D4AF37">
       م ق
     </text>
+
+    {/* Gold border ring — painted last to cleanly cap any overflow */}
+    <circle cx="32" cy="32" r="30" fill="none" stroke="#D4AF37" strokeWidth="1.5" />
   </svg>
 );
 
