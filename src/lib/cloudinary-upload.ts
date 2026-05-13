@@ -1,57 +1,47 @@
-const CLOUD  = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME  ?? '';
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? '';
-
 export type UploadResult = { publicId: string; url: string };
 
-/** Returns null (instead of throwing) when Cloudinary isn't configured. */
-export async function uploadToCloudinary(
-  file: File,
-  folder: string = 'meoqoum'
-): Promise<UploadResult | null> {
-  if (!CLOUD || !PRESET) return null;
+/* Folder constants — import these wherever you reference a folder path */
+export const FOLDERS = {
+  covers:   'meoqoum/covers',
+  books:    'meoqoum/books',
+  degrees:  'meoqoum/degrees',
+  profiles: 'meoqoum/profiles',
+  news:     'meoqoum/news',
+} as const;
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', PRESET);
-  formData.append('folder', folder);
+async function uploadViaServer(file: File, folder: string): Promise<UploadResult | null> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('folder', folder);
 
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`,
-    { method: 'POST', body: formData }
-  );
+  const res = await fetch('/api/upload', { method: 'POST', body: form });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? 'Cloudinary upload failed');
+    throw new Error(err?.error ?? 'Upload failed');
   }
 
-  const data = await res.json();
-  return { publicId: data.public_id as string, url: data.secure_url as string };
+  return res.json();
 }
 
-/** Returns null when Cloudinary isn't configured. */
+/** Upload an image (cover photo, profile picture, etc.) */
+export async function uploadToCloudinary(
+  file: File,
+  folder: string = FOLDERS.covers,
+): Promise<UploadResult | null> {
+  return uploadViaServer(file, folder);
+}
+
+/** Upload a document (PDF, ePub, degree certificate) */
 export async function uploadDocToCloudinary(
   file: File,
-  folder: string = 'meoqoum/degrees'
+  folder: string = FOLDERS.degrees,
 ): Promise<UploadResult | null> {
-  if (!CLOUD || !PRESET) return null;
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', PRESET);
-  formData.append('folder', folder);
-
-  const endpoint = file.type === 'application/pdf'
-    ? `https://api.cloudinary.com/v1_1/${CLOUD}/raw/upload`
-    : `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`;
-
-  const res = await fetch(endpoint, { method: 'POST', body: formData });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message ?? 'Cloudinary upload failed');
+  const MAX_BYTES = 10 * 1024 * 1024;
+  if (file.size > MAX_BYTES) {
+    throw new Error(
+      `File is ${(file.size / 1024 / 1024).toFixed(1)} MB — maximum is 10 MB. Please compress the file.`
+    );
   }
-
-  const data = await res.json();
-  return { publicId: data.public_id as string, url: data.secure_url as string };
+  return uploadViaServer(file, folder);
 }
