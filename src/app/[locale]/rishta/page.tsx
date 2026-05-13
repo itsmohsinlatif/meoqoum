@@ -312,6 +312,9 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
   const [eduLevel,   setEduLevel]   = useState('');
   const [country,    setCountry]    = useState('');
   const [status,     setStatus]     = useState('');
+  const [page,       setPage]       = useState(0);
+  const [hasMore,    setHasMore]    = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const palGotras = GOTRAS.filter(g => {
     const pal = PALS.find(p => String(p.id) === palId);
@@ -369,56 +372,47 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
     }
   }
 
+  const buildQuery = useCallback((p: number) => {
+    const params = new URLSearchParams();
+    params.set('page', String(p));
+    if (gender)   params.set('gender',   gender);
+    if (country)  params.set('country',  country);
+    if (palId)    params.set('palId',    palId);
+    if (eduLevel) params.set('eduLevel', eduLevel);
+    if (status)   params.set('status',   status);
+    if (ageMin)   params.set('ageMin',   ageMin);
+    if (ageMax)   params.set('ageMax',   ageMax);
+    return `/api/rishta?${params}`;
+  }, [gender, country, palId, eduLevel, status, ageMin, ageMax]);
+
   const fetchProfiles = useCallback(async () => {
     setLoading(true);
+    setPage(0);
     try {
-      const sb = getSupabase();
-      let q = sb
-        .from('marriage_profiles')
-        .select(`
-          *,
-          profiles (
-            id, first_name, last_name, date_of_birth, gender,
-            pal_id, gotra_id, education_level, profession,
-            country, city, marital_status, profile_pic_id, bio,
-            pals ( name_en, name_ur ),
-            gotras ( name_en, name_ur )
-          )
-        `)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (gender)    q = q.eq('profiles.gender', gender);
-      if (status)    q = q.eq('profiles.marital_status', status);
-      if (country)   q = q.eq('profiles.country', country);
-      if (eduLevel)  q = q.gte('profiles.education_level', eduLevel);
-      if (palId)     q = q.eq('profiles.pal_id', Number(palId));
-
-      const { data } = await q;
-      let results = (data ?? []) as MarriageProfile[];
-
-      /* Fall back to sample data when DB is empty or not yet configured */
-      if (results.length === 0) results = SAMPLE_RISHTA as MarriageProfile[];
-
-      /* Client-side age filter */
-      if (ageMin || ageMax) {
-        results = results.filter(mp => {
-          if (!mp.profiles?.date_of_birth) return true;
-          const age = ageFrom(mp.profiles.date_of_birth);
-          return age >= Number(ageMin || 18) && age <= Number(ageMax || 100);
-        });
-      }
-
-      /* Client-side gender/pal filter on sample data */
-      if (gender)  results = results.filter(mp => mp.profiles?.gender === gender);
-      if (palId)   results = results.filter(mp => String(mp.profiles?.pal_id) === palId);
-      if (country) results = results.filter(mp => mp.profiles?.country === country);
-
-      setProfiles(results);
+      const res  = await fetch(buildQuery(0));
+      const json = await res.json();
+      const results: MarriageProfile[] = json.profiles ?? [];
+      /* Fall back to sample data only when DB returns nothing */
+      setProfiles(results.length > 0 ? results : SAMPLE_RISHTA as MarriageProfile[]);
+      setHasMore(json.hasMore ?? false);
     } finally {
       setLoading(false);
     }
-  }, [gender, ageMin, ageMax, palId, gotraSlug, eduLevel, country, status]);
+  }, [buildQuery]);
+
+  async function loadMore() {
+    const next = page + 1;
+    setLoadingMore(true);
+    try {
+      const res  = await fetch(buildQuery(next));
+      const json = await res.json();
+      setProfiles(prev => [...prev, ...(json.profiles ?? [])]);
+      setHasMore(json.hasMore ?? false);
+      setPage(next);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
 
@@ -674,28 +668,71 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
           {/* ── Profile grid ── */}
           <div>
             {loading ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-                <StarKhatim size={40} color="#D4AF37" />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 20 }}>
+                <svg width="56" height="56" viewBox="0 0 56 56" style={{ animation: 'rishta-spin 1.1s linear infinite' }}>
+                  <circle cx="28" cy="28" r="22" fill="none" stroke="#e8dfc4" strokeWidth="4"/>
+                  <circle cx="28" cy="28" r="22" fill="none" stroke="#D4AF37" strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray="34 104"
+                    strokeDashoffset="0"/>
+                  <circle cx="28" cy="28" r="10" fill="none" stroke="#004225" strokeWidth="3"/>
+                  <circle cx="28" cy="28" r="4" fill="#D4AF37"/>
+                </svg>
+                <span style={{ fontFamily: ff, fontSize: 13, color: 'var(--ink-mute)', letterSpacing: locale === 'en' ? '0.1em' : 0 }}>
+                  {locale === 'en' ? 'Loading profiles…' : locale === 'ur' ? 'پروفائل لوڈ ہو رہے ہیں…' : 'پروفائل لوڈ ہو راں ہاں…'}
+                </span>
+                <style>{`@keyframes rishta-spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : profiles.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 80, color: 'var(--ink-mute)', fontFamily: ff }}>
                 {d.noResults[locale]}
               </div>
             ) : (
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                gap: 'clamp(16px,1.5vw,20px)',
-              }}>
-                {profiles.map(mp => (
-                  <ProfileCard
-                    key={mp.id} mp={mp} locale={locale}
-                    ff={ff} ffH={ffH} dir={dir}
-                    isLoggedIn={Boolean(user)} d={d}
-                    onExpand={() => setExpanded(mp)}
-                  />
-                ))}
-              </div>
+              <>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: 'clamp(16px,1.5vw,20px)',
+                }}>
+                  {profiles.map(mp => (
+                    <ProfileCard
+                      key={mp.id} mp={mp} locale={locale}
+                      ff={ff} ffH={ffH} dir={dir}
+                      isLoggedIn={Boolean(user)} d={d}
+                      onExpand={() => setExpanded(mp)}
+                    />
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <div style={{ textAlign: 'center', marginTop: 32 }}>
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      style={{
+                        background: 'var(--emerald)', color: 'var(--cream)',
+                        border: 'none', padding: '12px 36px',
+                        fontFamily: ff, fontSize: 14, fontWeight: 600,
+                        cursor: loadingMore ? 'wait' : 'pointer',
+                        opacity: loadingMore ? 0.7 : 1,
+                        letterSpacing: locale === 'en' ? '0.06em' : 0,
+                        textTransform: locale === 'en' ? 'uppercase' : 'none',
+                      }}
+                    >
+                      {loadingMore ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="18" height="18" viewBox="0 0 56 56" style={{ animation: 'rishta-spin 1.1s linear infinite' }}>
+                          <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(245,245,220,0.3)" strokeWidth="5"/>
+                          <circle cx="28" cy="28" r="22" fill="none" stroke="var(--cream)" strokeWidth="5"
+                            strokeLinecap="round" strokeDasharray="34 104"/>
+                        </svg>
+                        {locale === 'en' ? 'Loading…' : 'لوڈ ہو رہا ہے…'}
+                      </span>
+                    ) : (locale === 'en' ? 'Load more profiles' : locale === 'ur' ? 'مزید پروفائل دیکھیں' : 'مزید پروفائل دیکھو')}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
