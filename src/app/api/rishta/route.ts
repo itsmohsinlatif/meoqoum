@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
 
   const admin = getAdmin();
 
-  let q = admin
+  /* Fetch all active marriage profiles — filtering on joined table columns
+     via PostgREST .eq() is not supported, so we filter in JS server-side */
+  const { data, error } = await admin
     .from('marriage_profiles')
     .select(`
       *,
@@ -33,38 +35,45 @@ export async function GET(req: NextRequest) {
         pals ( name_en, name_ur ),
         gotras ( name_en, name_ur )
       )
-    `, { count: 'exact' })
+    `)
     .eq('is_active', true)
-    .order('created_at', { ascending: false })
-    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-
-  if (gender)   q = q.eq('profiles.gender',          gender);
-  if (country)  q = q.eq('profiles.country',          country);
-  if (palId)    q = q.eq('profiles.pal_id',           Number(palId));
-  if (eduLevel) q = q.eq('profiles.education_level',  eduLevel);
-  if (status)   q = q.eq('profiles.marital_status',   status);
-
-  const { data, error, count } = await q;
+    .order('created_at', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  /* Client-side age filter (DOB stored as string, easier server-side here) */
   const today = new Date();
+
+  /* Apply all filters in JavaScript */
   const filtered = (data ?? []).filter(mp => {
-    const dob = (mp as any).profiles?.date_of_birth;
-    if (!dob) return true;
-    const birth = new Date(dob);
-    let age = today.getFullYear() - birth.getFullYear();
-    if (today.getMonth() < birth.getMonth() ||
-        (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
-    return age >= ageMin && age <= ageMax;
+    const p = (mp as any).profiles;
+    if (!p) return false;
+
+    if (gender   && p.gender           !== gender)          return false;
+    if (country  && p.country          !== country)         return false;
+    if (palId    && String(p.pal_id)   !== palId)           return false;
+    if (eduLevel && p.education_level  !== eduLevel)        return false;
+    if (status   && p.marital_status   !== status)          return false;
+
+    /* Age filter */
+    if (p.date_of_birth) {
+      const birth = new Date(p.date_of_birth);
+      let age = today.getFullYear() - birth.getFullYear();
+      if (today.getMonth() < birth.getMonth() ||
+          (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
+      if (age < ageMin || age > ageMax) return false;
+    }
+
+    return true;
   });
 
+  const total    = filtered.length;
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return NextResponse.json({
-    profiles: filtered,
-    total:    count ?? 0,
+    profiles: paginated,
+    total,
     page,
     pageSize: PAGE_SIZE,
-    hasMore:  (page + 1) * PAGE_SIZE < (count ?? 0),
+    hasMore:  (page + 1) * PAGE_SIZE < total,
   });
 }
