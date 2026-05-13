@@ -11,7 +11,6 @@ import { routing } from '@/config/routing';
 import { RISHTA, type Locale } from '@/data/content';
 import { PALS, GOTRAS, EDUCATION_LEVELS, MARITAL_STATUS, COUNTRIES } from '@/data/form-options';
 import { getSupabase, type MarriageProfile } from '@/lib/supabase-browser';
-import { SAMPLE_RISHTA } from '@/data/sample-profiles';
 import { cldUrl } from '@/lib/cloudinary';
 import type { User } from '@supabase/supabase-js';
 
@@ -392,8 +391,7 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
       const res  = await fetch(buildQuery(0));
       const json = await res.json();
       const results: MarriageProfile[] = json.profiles ?? [];
-      /* Fall back to sample data only when DB returns nothing */
-      setProfiles(results.length > 0 ? results : SAMPLE_RISHTA as MarriageProfile[]);
+      setProfiles(results);
       setHasMore(json.hasMore ?? false);
     } finally {
       setLoading(false);
@@ -658,7 +656,9 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
                 <FilterRow label={d.filterStatus[locale]} ff={ff}>
                   <select style={SEL} value={status} onChange={e => setStatus(e.target.value)}>
                     <option value="">{d.anyOption[locale]}</option>
-                    {MARITAL_STATUS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    {MARITAL_STATUS
+                      .filter(s => s.value !== 'married' && s.value !== 'other')
+                      .map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                 </FilterRow>
               </div>
