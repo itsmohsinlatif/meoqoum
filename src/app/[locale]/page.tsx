@@ -115,15 +115,14 @@ export default async function HomePage({
                 fill="url(#arch-fill)" stroke="#D4AF37" strokeWidth="2"/>
               <path d="M 65 470 L 65 245 Q 65 115 200 78 Q 335 115 335 245 L 335 470 Z"
                 fill="none" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5"/>
-              <g transform="translate(200,260)">
-                <polygon points="0,-90 64,-64 90,0 64,64 0,90 -64,64 -90,0 -64,-64"
-                  fill="#D4AF37" opacity="0.95"/>
-                <polygon points="0,-90 64,-64 90,0 64,64 0,90 -64,64 -90,0 -64,-64"
-                  transform="rotate(22.5)" fill="none" stroke="#F5F5DC" strokeWidth="1.2"/>
-                <circle r="22" fill="#003319"/>
-                <circle r="14" fill="none" stroke="#D4AF37" strokeWidth="1"/>
-                <text y="5" textAnchor="middle" fontFamily="Cormorant Garamond, serif"
-                  fontSize="18" fill="#D4AF37" fontWeight="600">م ق</text>
+              <g transform="translate(200,255)">
+                {/* Decorative star ring */}
+                <polygon points="0,-95 67,-67 95,0 67,67 0,95 -67,67 -95,0 -67,-67"
+                  fill="#D4AF37" opacity="0.18"/>
+                <polygon points="0,-95 67,-67 95,0 67,67 0,95 -67,67 -95,0 -67,-67"
+                  transform="rotate(22.5)" fill="none" stroke="#D4AF37" strokeWidth="1.2" opacity="0.6"/>
+                {/* Turban PNG — white on dark arch looks crisp */}
+                <image href="/logo.png" x="-72" y="-82" width="144" height="144" />
               </g>
               <text x="200" y="400" textAnchor="middle"
                 fontFamily="Noto Nastaliq Urdu, serif" fontSize="22" fill="#D4AF37">
