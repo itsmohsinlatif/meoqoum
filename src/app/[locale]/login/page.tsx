@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -11,6 +11,14 @@ import { LOGIN, type Locale } from '@/data/content';
 import { getSupabase } from '@/lib/supabase-browser';
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+  return (
+    <Suspense>
+      <LoginForm params={params} />
+    </Suspense>
+  );
+}
+
+function LoginForm({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = use(params);
   if (!routing.locales.includes(rawLocale as (typeof routing.locales)[number])) notFound();
   const locale = rawLocale as Locale;
@@ -211,6 +219,9 @@ function inputStyle(ff: string, dir: string): React.CSSProperties {
     padding: '10px 12px',
     fontFamily: ff, fontSize: 14, color: 'var(--ink)',
     background: 'var(--paper)',
-    outline: 'none', direction: dir as 'ltr' | 'rtl',
+    outline: 'none',
+    /* email & password are always LTR — RTL breaks browser validation */
+    direction: 'ltr',
+    textAlign: dir === 'rtl' ? 'right' : 'left',
   };
 }

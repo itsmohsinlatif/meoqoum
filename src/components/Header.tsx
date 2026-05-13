@@ -272,7 +272,16 @@ export default function Header({ active }: HeaderProps) {
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Link href={`/${locale}/login`} style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: 'var(--ink-soft)', textDecoration: 'none', padding: '6px 10px', letterSpacing: locale === 'en' ? '0.06em' : 0 }}>
+              <Link href={`/${locale}/login`} style={{
+                fontFamily: ff, fontSize: 12, fontWeight: 700,
+                color: 'var(--gold)', textDecoration: 'none',
+                padding: '7px 14px',
+                border: '1.5px solid var(--gold)',
+                borderRadius: 3,
+                letterSpacing: locale === 'en' ? '0.08em' : 0,
+                textTransform: locale === 'en' ? 'uppercase' : 'none',
+                whiteSpace: 'nowrap',
+              }}>
                 {T.login[locale]}
               </Link>
               <Link href={`/${locale}/join`} style={{ background: 'var(--gold)', color: 'var(--emerald-deep)', fontFamily: ff, fontSize: 11, fontWeight: 700, textDecoration: 'none', padding: '8px 14px', letterSpacing: locale === 'en' ? '0.1em' : 0, textTransform: locale === 'en' ? 'uppercase' : 'none', whiteSpace: 'nowrap', minHeight: 36, display: 'flex', alignItems: 'center' }}>
