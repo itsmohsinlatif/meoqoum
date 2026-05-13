@@ -53,6 +53,20 @@ type DbDegree = {
   profiles: { first_name: string; last_name: string; country: string | null; gender: string } | null;
 };
 
+type FullUser = {
+  id: string; first_name: string; last_name: string; gender: string;
+  country: string | null; city: string | null; is_verified: boolean;
+  email: string | null; created_at: string;
+  marriage_profile: {
+    id: string; is_active: boolean;
+    about: string | null; height: string | null; weight: string | null;
+    complexion: string | null; education: string | null; profession: string | null;
+    income: string | null; looking_for: string | null;
+    degree_doc_id: string | null; degree_type: string | null;
+    is_degree_verified: boolean; degree_status: string; degree_note: string | null;
+  } | null;
+};
+
 /* ── Palette ─────────────────────────────────────────────── */
 const A = {
   bg:     '#0f1117',
@@ -616,6 +630,223 @@ function ArticleRow({ art, token, onDelete }: { art: DbArticle; token: string; o
   );
 }
 
+/* ── User Profile Drawer ─────────────────────────────────── */
+function UserDrawer({
+  userId, token, locale, onClose,
+  onVerify, onAmend,
+}: {
+  userId: string; token: string; locale: string;
+  onClose: () => void;
+  onVerify: (marriageProfileId: string) => void;
+  onAmend: (marriageProfileId: string) => void;
+}) {
+  const [fu, setFu] = useState<FullUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { setFu(d.user ?? null); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [userId, token]);
+
+  const mp = fu?.marriage_profile;
+  const pdfUrl = mp?.degree_doc_id
+    ? `/api/pdf?url=https://res.cloudinary.com/${cloudName}/raw/upload/${mp.degree_doc_id}`
+    : null;
+
+  const statusColor = mp?.degree_status === 'verified' ? A.accent
+    : mp?.degree_status === 'amendment_requested' ? A.danger : A.gold;
+
+  function Row({ label, value }: { label: string; value?: string | null }) {
+    if (!value) return null;
+    return (
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+        <span style={{ fontSize: 11, color: A.mute, minWidth: 110, paddingTop: 1 }}>{label}</span>
+        <span style={{ fontSize: 13, color: A.text, flex: 1 }}>{value}</span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Dark overlay */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+          zIndex: 200, cursor: 'pointer',
+        }}
+      />
+
+      {/* Drawer panel */}
+      <div style={{
+        position: 'fixed', top: 0, right: 0, bottom: 0,
+        width: 'min(520px, 100vw)',
+        background: A.panel, borderInlineStart: `1px solid ${A.border}`,
+        zIndex: 201, overflowY: 'auto',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        {/* Drawer header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px', borderBottom: `1px solid ${A.border}`,
+          position: 'sticky', top: 0, background: A.panel, zIndex: 1,
+        }}>
+          <span style={{ fontWeight: 700, fontSize: 15, color: A.text }}>
+            Member Profile
+          </span>
+          <button onClick={onClose} style={{
+            background: 'transparent', border: `1px solid ${A.border}`,
+            color: A.mute, width: 32, height: 32, borderRadius: 6,
+            cursor: 'pointer', fontSize: 18, display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+          }}>✕</button>
+        </div>
+
+        <div style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {loading ? (
+            <p style={{ color: A.mute, fontSize: 13, textAlign: 'center', paddingTop: 40 }}>
+              Loading…
+            </p>
+          ) : !fu ? (
+            <p style={{ color: A.danger, fontSize: 13 }}>Could not load profile.</p>
+          ) : (
+            <>
+              {/* ── Basic profile ── */}
+              <section style={{ background: A.bg, borderRadius: 6, padding: 16, border: `1px solid ${A.border}` }}>
+                <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.mute, marginBottom: 12 }}>
+                  Basic Info
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: A.text, marginBottom: 4 }}>
+                  {fu.first_name} {fu.last_name}
+                  {fu.is_verified && <span style={{ marginInlineStart: 8, fontSize: 11, color: A.accent }}>✓ Verified</span>}
+                </div>
+                <div style={{ fontSize: 12, color: A.mute, marginBottom: 12 }}>{fu.email}</div>
+                <Row label="Gender" value={fu.gender} />
+                <Row label="Location" value={[fu.city, fu.country].filter(Boolean).join(', ')} />
+                <Row label="Member since" value={new Date(fu.created_at).toLocaleDateString()} />
+                <div style={{ marginTop: 10 }}>
+                  <a
+                    href={`/${locale}/rishta`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: 12, color: A.gold, textDecoration: 'none' }}
+                  >
+                    View public rishta directory →
+                  </a>
+                </div>
+              </section>
+
+              {/* ── Rishta profile ── */}
+              {mp ? (
+                <section style={{ background: A.bg, borderRadius: 6, padding: 16, border: `1px solid ${A.border}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.mute }}>
+                      Rishta Profile
+                    </div>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10,
+                      background: mp.is_active ? `${A.accent}20` : `${A.border}`,
+                      color: mp.is_active ? A.accent : A.mute }}>
+                      {mp.is_active ? 'Visible' : 'Hidden'}
+                    </span>
+                  </div>
+                  {mp.about && (
+                    <p style={{ fontSize: 13, color: '#b0b8c8', lineHeight: 1.7, marginBottom: 12, fontStyle: 'italic' }}>
+                      "{mp.about}"
+                    </p>
+                  )}
+                  <Row label="Education"  value={mp.education} />
+                  <Row label="Profession" value={mp.profession} />
+                  <Row label="Income"     value={mp.income} />
+                  <Row label="Height"     value={mp.height} />
+                  <Row label="Weight"     value={mp.weight} />
+                  <Row label="Complexion" value={mp.complexion} />
+                  <Row label="Looking for" value={mp.looking_for} />
+                </section>
+              ) : (
+                <section style={{ background: A.bg, borderRadius: 6, padding: 16, border: `1px solid ${A.border}` }}>
+                  <div style={{ fontSize: 13, color: A.mute }}>No rishta profile created.</div>
+                </section>
+              )}
+
+              {/* ── Degree / Document ── */}
+              <section style={{ background: A.bg, borderRadius: 6, padding: 16, border: `1px solid ${mp?.degree_doc_id ? statusColor + '44' : A.border}` }}>
+                <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.mute, marginBottom: 12 }}>
+                  Degree / Document
+                </div>
+
+                {mp?.degree_doc_id ? (
+                  <>
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
+                      <span style={{ fontSize: 13, color: A.text }}>{mp.degree_type ?? 'Document'}</span>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, fontWeight: 700,
+                        background: `${statusColor}22`, color: statusColor }}>
+                        {mp.degree_status === 'verified' ? '✓ Verified'
+                          : mp.degree_status === 'amendment_requested' ? '⚠ Amendment Requested'
+                          : '⏳ Pending Review'}
+                      </span>
+                    </div>
+
+                    {mp.degree_note && (
+                      <div style={{ marginBottom: 12, fontSize: 12, color: A.mute,
+                        background: '#0f1117', padding: '8px 12px', borderRadius: 4 }}>
+                        Last note: {mp.degree_note}
+                      </div>
+                    )}
+
+                    {/* Embedded PDF viewer */}
+                    {pdfUrl && (
+                      <div style={{ marginBottom: 14 }}>
+                        <iframe
+                          src={pdfUrl}
+                          title="Degree document"
+                          style={{
+                            width: '100%', height: 420, border: `1px solid ${A.border}`,
+                            borderRadius: 4, background: '#fff',
+                          }}
+                        />
+                        <a
+                          href={pdfUrl} target="_blank" rel="noopener noreferrer"
+                          style={{ display: 'inline-block', marginTop: 6, fontSize: 11, color: A.mute, textDecoration: 'none' }}
+                        >
+                          ↗ Open in new tab
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    {mp.degree_status !== 'verified' && (
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <Btn style={{ flex: 1, minWidth: 120 }}
+                          onClick={() => { onVerify(mp.id); onClose(); }}>
+                          ✓ Verify Document
+                        </Btn>
+                        <Btn variant="danger" style={{ flex: 1, minWidth: 140 }}
+                          onClick={() => { onAmend(mp.id); onClose(); }}>
+                          ⚠ Request Amendment
+                        </Btn>
+                      </div>
+                    )}
+                    {mp.degree_status === 'verified' && (
+                      <div style={{ fontSize: 12, color: A.accent }}>
+                        ✓ Document has been verified
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ fontSize: 13, color: A.mute }}>No document uploaded.</div>
+                )}
+              </section>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ── Page ─────────────────────────────────────────────────── */
 export default function AdminPage({
   params,
@@ -636,6 +867,7 @@ export default function AdminPage({
   const [degrees,  setDegrees]  = useState<DbDegree[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<DbBook | DbArticle | null>(null);
+  const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
 
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -827,7 +1059,11 @@ export default function AdminPage({
                               </span>
                             ) : <span style={{ color: A.mute, fontSize: 11 }}>None</span>}
                           </td>
-                          <td style={{ padding: '10px 12px' }}>
+                          <td style={{ padding: '10px 12px', display: 'flex', gap: 6 }}>
+                            <Btn variant="ghost" style={{ padding: '5px 10px', fontSize: 11 }}
+                              onClick={() => setDrawerUserId(u.id)}>
+                              View
+                            </Btn>
                             <Btn variant={u.is_verified ? 'ghost' : 'primary'} style={{ padding: '5px 12px', fontSize: 11 }}
                               onClick={async () => {
                                 await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: 'toggle_verified', profile_id: u.id, value: !u.is_verified }) });
@@ -932,6 +1168,32 @@ export default function AdminPage({
           </details>
         </main>
       </div>
+
+      {drawerUserId && (
+        <UserDrawer
+          userId={drawerUserId}
+          token={token}
+          locale={locale}
+          onClose={() => setDrawerUserId(null)}
+          onVerify={async (marriageProfileId) => {
+            await fetch('/api/admin/degrees', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ action: 'verify', id: marriageProfileId }),
+            });
+            loadUsers(); loadDegrees();
+          }}
+          onAmend={async (marriageProfileId) => {
+            const note = prompt('Amendment message to user:') ?? 'Please re-upload a clearer document.';
+            await fetch('/api/admin/degrees', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ action: 'amend', id: marriageProfileId, note }),
+            });
+            loadUsers(); loadDegrees();
+          }}
+        />
+      )}
     </div>
   );
 }
