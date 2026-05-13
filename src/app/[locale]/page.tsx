@@ -6,8 +6,6 @@ import { GeoPattern, StarKhatim, Arrow } from '@/components/svg';
 import { routing } from '@/config/routing';
 import { HOME, type Locale } from '@/data/content';
 import Link from 'next/link';
-// Cloudinary demo-cloud sample images (always available, no config needed)
-const DEMO = 'https://res.cloudinary.com/demo/image/upload';
 
 export default async function HomePage({
   params,
@@ -258,12 +256,38 @@ export default async function HomePage({
             gap: 4,
           }}>
             {[
-              { id: 'cld-sample-5', label: locale === 'en' ? 'Historical Mewat' : 'تاریخی میوات', effect: 'e_sepia:40' },
-              { id: 'cld-sample-3', label: locale === 'en' ? 'Community life' : 'سماجی زندگی', effect: 'e_improve' },
-              { id: 'cld-sample-4', label: locale === 'en' ? 'Aravalli landscape' : 'اراولی منظر', effect: 'e_improve' },
-              { id: 'cld-sample-2', label: locale === 'en' ? 'Mewati village' : 'میواتی گاؤں', effect: 'e_improve' },
-              { id: 'cld-sample',   label: locale === 'en' ? 'Harvest season' : 'فصل کا موسم', effect: 'e_improve' },
-              { id: 'cld-sample-5', label: locale === 'en' ? 'Heritage mosque' : 'تاریخی مسجد', effect: 'e_art:incognito' },
+              {
+                src: '/pictures/historical-mewat.avif',
+                label: { en: 'Historical Mewat', ur: 'تاریخی میوات', mew: 'تاریخی میوات' },
+              },
+              {
+                src: '/pictures/people-sitting.webp',
+                label: { en: 'Community life', ur: 'سماجی زندگی', mew: 'سماجی زندگی' },
+              },
+              {
+                src: '/pictures/aravali-hills.webp',
+                label: { en: 'Aravalli landscape', ur: 'اراولی منظر', mew: 'اراولی منظر' },
+              },
+              {
+                src: '/pictures/mewat_village.jpg',
+                label: { en: 'Mewati village', ur: 'میواتی گاؤں', mew: 'میواتی گاؤں' },
+              },
+              {
+                src: '/pictures/harvesting.jpg',
+                label: { en: 'Harvest season', ur: 'فصل کا موسم', mew: 'فصل کو موسم' },
+              },
+              {
+                src: '/pictures/Heritage-mosque.webp',
+                label: { en: 'Heritage mosque', ur: 'تاریخی مسجد', mew: 'تاریخی مسجد' },
+              },
+              {
+                src: '/pictures/people.webp',
+                label: { en: 'Meo people', ur: 'میو قوم', mew: 'میو قوم' },
+              },
+              {
+                src: '/pictures/Raja-Hasan-Khan-Mewati.png',
+                label: { en: 'Raja Hasan Khan Mewati', ur: 'راجہ حسن خان میواتی', mew: 'راجہ حسن خان میواتی' },
+              },
             ].map((photo, i) => (
               <div key={i} style={{
                 position: 'relative', overflow: 'hidden',
@@ -271,8 +295,8 @@ export default async function HomePage({
                 background: 'var(--emerald)',
               }}>
                 <Image
-                  src={`${DEMO}/w_500,h_300,c_fill,q_auto,f_auto,${photo.effect}/${photo.id}`}
-                  alt={photo.label}
+                  src={photo.src}
+                  alt={photo.label[locale]}
                   fill
                   style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
                   sizes="(max-width:768px) 50vw, 25vw"
@@ -286,22 +310,11 @@ export default async function HomePage({
                   fontFamily: ff, fontSize: 12, color: 'var(--cream)',
                   fontWeight: 500, letterSpacing: locale === 'en' ? '0.06em' : 0,
                 }}>
-                  {photo.label}
+                  {photo.label[locale]}
                 </div>
               </div>
             ))}
           </div>
-          <p style={{
-            textAlign: 'center', marginTop: 20,
-            fontFamily: ff, fontSize: 12,
-            color: 'rgba(245,245,220,0.4)',
-          }}>
-            {locale === 'en'
-              ? 'Sample images — upload your own Mewat photos to editors@meoqoum.com'
-              : locale === 'ur'
-              ? 'نمونہ تصاویر — اپنی میوات کی تصویریں editors@meoqoum.com پر بھیجیں'
-              : 'نمونہ تصویراں — اپنی میوات کی تصویراں editors@meoqoum.com پر بھیجو'}
-          </p>
         </div>
       </section>
 
@@ -353,8 +366,8 @@ export default async function HomePage({
               color: 'var(--cream)',
             }}>
               <Image
-                src={`${DEMO}/w_800,q_auto,f_auto/cld-sample-5`}
-                alt="Heritage palace — sample image"
+                src="/pictures/Heritage-mosque.webp"
+                alt="Heritage mosque — Mewat"
                 fill
                 style={{ objectFit: 'cover' }}
                 sizes="(max-width: 768px) 100vw, 600px"
@@ -392,8 +405,8 @@ export default async function HomePage({
                 title: locale === 'en' ? 'A panchayat record from 1842' :
                        locale === 'ur' ? '1842 کی پنچایت کی بہی' :
                        '1842 کی پنچائت کی بہی',
-                imgSrc: `${DEMO}/w_500,q_auto,f_auto,e_sepia:60/cld-sample-2`,
-                imgAlt: 'Archive manuscript sample',
+                imgSrc: '/pictures/people-sitting.webp',
+                imgAlt: 'Community life in Mewat',
                 fallbackBg: 'linear-gradient(135deg, #d6c590, #a89060)',
               },
               {
@@ -402,8 +415,8 @@ export default async function HomePage({
                 title: locale === 'en' ? 'Fields of the Aravalli foothills' :
                        locale === 'ur' ? 'اراولی کی تلہٹی کے کھیت' :
                        'اراولی کی تلہٹی کے کھیت',
-                imgSrc: `${DEMO}/w_500,q_auto,f_auto/cld-sample-4`,
-                imgAlt: 'Landscape sample image',
+                imgSrc: '/pictures/aravali-hills.webp',
+                imgAlt: 'Aravalli landscape Mewat',
                 fallbackBg: 'linear-gradient(135deg, #5a7d5d, #2d4a30)',
               },
             ].map((card, i) => (

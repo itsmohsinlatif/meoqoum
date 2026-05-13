@@ -301,6 +301,9 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
   const [expanded,    setExpanded]    = useState<MarriageProfile | null>(null);
 
   /* Filters */
+  const [filterOpen, setFilterOpen] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth > 700 : true
+  );
   const [gender,     setGender]     = useState('');
   const [ageMin,     setAgeMin]     = useState('18');
   const [ageMax,     setAgeMax]     = useState('60');
@@ -569,84 +572,103 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
           <aside style={{
             background: 'var(--paper)',
             border: '1px solid var(--rule)',
-            padding: '24px 20px',
+            padding: '20px 20px',
             position: 'sticky', top: 20,
+            alignSelf: 'start',
           }}>
             <div style={{
               fontFamily: ff, fontSize: 12, fontWeight: 700,
               letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: 'var(--emerald)', marginBottom: 20,
-              paddingBottom: 10, borderBottom: '2px solid var(--gold)',
+              color: 'var(--emerald)', marginBottom: filterOpen ? 20 : 0,
+              paddingBottom: filterOpen ? 10 : 0,
+              borderBottom: filterOpen ? '2px solid var(--gold)' : 'none',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
-              <span>{locale === 'en' ? 'Filters' : locale === 'ur' ? 'فلٹر' : 'فلٹر'}</span>
-              <button onClick={clearFilters} style={{
-                background: 'transparent', border: 0, cursor: 'pointer',
-                color: 'var(--ink-mute)', fontFamily: ff, fontSize: 11,
-                textDecoration: 'underline',
-              }}>
-                {d.clearFilters[locale]}
+              <button
+                onClick={() => setFilterOpen(v => !v)}
+                className="filter-toggle"
+                style={{
+                  background: 'transparent', border: 0, cursor: 'pointer',
+                  fontFamily: ff, fontSize: 12, fontWeight: 700,
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: 'var(--emerald)', padding: 0,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                <span>{filterOpen ? '▲' : '▼'}</span>
+                <span>{locale === 'en' ? 'Filters' : locale === 'ur' ? 'فلٹر' : 'فلٹر'}</span>
               </button>
+              {filterOpen && (
+                <button onClick={clearFilters} style={{
+                  background: 'transparent', border: 0, cursor: 'pointer',
+                  color: 'var(--ink-mute)', fontFamily: ff, fontSize: 11,
+                  textDecoration: 'underline',
+                }}>
+                  {d.clearFilters[locale]}
+                </button>
+              )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <FilterRow label={d.filterGender[locale]} ff={ff}>
-                <select style={SEL} value={gender} onChange={e => setGender(e.target.value)}>
-                  <option value="">{d.anyOption[locale]}</option>
-                  <option value="male">{locale === 'en' ? 'Male' : locale === 'ur' ? 'مرد' : 'مرد'}</option>
-                  <option value="female">{locale === 'en' ? 'Female' : locale === 'ur' ? 'عورت' : 'عورت'}</option>
-                </select>
-              </FilterRow>
-
-              <FilterRow label={d.filterAge[locale]} ff={ff}>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <input type="number" min={18} max={80} value={ageMin}
-                    onChange={e => setAgeMin(e.target.value)}
-                    style={{ ...SEL, width: '45%' }} />
-                  <span style={{ fontFamily: ff, fontSize: 12, color: 'var(--ink-mute)' }}>–</span>
-                  <input type="number" min={18} max={80} value={ageMax}
-                    onChange={e => setAgeMax(e.target.value)}
-                    style={{ ...SEL, width: '45%' }} />
-                </div>
-              </FilterRow>
-
-              <FilterRow label={d.filterPal[locale]} ff={ff}>
-                <select style={SEL} value={palId} onChange={e => { setPalId(e.target.value); setGotraSlug(''); }}>
-                  <option value="">{d.anyOption[locale]}</option>
-                  {PALS.map(p => <option key={p.id} value={String(p.id)}>{p.name}</option>)}
-                </select>
-              </FilterRow>
-
-              {palId && (
-                <FilterRow label={d.filterGotra[locale]} ff={ff}>
-                  <select style={SEL} value={gotraSlug} onChange={e => setGotraSlug(e.target.value)}>
+            {filterOpen && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <FilterRow label={d.filterGender[locale]} ff={ff}>
+                  <select style={SEL} value={gender} onChange={e => setGender(e.target.value)}>
                     <option value="">{d.anyOption[locale]}</option>
-                    {palGotras.map((g, i) => <option key={i} value={g.name}>{g.name}</option>)}
+                    <option value="male">{locale === 'en' ? 'Male' : locale === 'ur' ? 'مرد' : 'مرد'}</option>
+                    <option value="female">{locale === 'en' ? 'Female' : locale === 'ur' ? 'عورت' : 'عورت'}</option>
                   </select>
                 </FilterRow>
-              )}
 
-              <FilterRow label={d.filterEdu[locale]} ff={ff}>
-                <select style={SEL} value={eduLevel} onChange={e => setEduLevel(e.target.value)}>
-                  <option value="">{d.anyOption[locale]}</option>
-                  {EDUCATION_LEVELS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
-                </select>
-              </FilterRow>
+                <FilterRow label={d.filterAge[locale]} ff={ff}>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <input type="number" min={18} max={80} value={ageMin}
+                      onChange={e => setAgeMin(e.target.value)}
+                      style={{ ...SEL, width: '45%' }} />
+                    <span style={{ fontFamily: ff, fontSize: 12, color: 'var(--ink-mute)' }}>–</span>
+                    <input type="number" min={18} max={80} value={ageMax}
+                      onChange={e => setAgeMax(e.target.value)}
+                      style={{ ...SEL, width: '45%' }} />
+                  </div>
+                </FilterRow>
 
-              <FilterRow label={d.filterCountry[locale]} ff={ff}>
-                <select style={SEL} value={country} onChange={e => setCountry(e.target.value)}>
-                  <option value="">{d.anyOption[locale]}</option>
-                  {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
-                </select>
-              </FilterRow>
+                <FilterRow label={d.filterPal[locale]} ff={ff}>
+                  <select style={SEL} value={palId} onChange={e => { setPalId(e.target.value); setGotraSlug(''); }}>
+                    <option value="">{d.anyOption[locale]}</option>
+                    {PALS.map(p => <option key={p.id} value={String(p.id)}>{p.name}</option>)}
+                  </select>
+                </FilterRow>
 
-              <FilterRow label={d.filterStatus[locale]} ff={ff}>
-                <select style={SEL} value={status} onChange={e => setStatus(e.target.value)}>
-                  <option value="">{d.anyOption[locale]}</option>
-                  {MARITAL_STATUS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                </select>
-              </FilterRow>
-            </div>
+                {palId && (
+                  <FilterRow label={d.filterGotra[locale]} ff={ff}>
+                    <select style={SEL} value={gotraSlug} onChange={e => setGotraSlug(e.target.value)}>
+                      <option value="">{d.anyOption[locale]}</option>
+                      {palGotras.map((g, i) => <option key={i} value={g.name}>{g.name}</option>)}
+                    </select>
+                  </FilterRow>
+                )}
+
+                <FilterRow label={d.filterEdu[locale]} ff={ff}>
+                  <select style={SEL} value={eduLevel} onChange={e => setEduLevel(e.target.value)}>
+                    <option value="">{d.anyOption[locale]}</option>
+                    {EDUCATION_LEVELS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
+                  </select>
+                </FilterRow>
+
+                <FilterRow label={d.filterCountry[locale]} ff={ff}>
+                  <select style={SEL} value={country} onChange={e => setCountry(e.target.value)}>
+                    <option value="">{d.anyOption[locale]}</option>
+                    {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                  </select>
+                </FilterRow>
+
+                <FilterRow label={d.filterStatus[locale]} ff={ff}>
+                  <select style={SEL} value={status} onChange={e => setStatus(e.target.value)}>
+                    <option value="">{d.anyOption[locale]}</option>
+                    {MARITAL_STATUS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                </FilterRow>
+              </div>
+            )}
           </aside>
 
           {/* ── Profile grid ── */}
@@ -691,8 +713,13 @@ export default function RishtaPage({ params }: { params: Promise<{ locale: strin
       )}
 
       <style>{`
+        @media (min-width: 701px) {
+          .filter-toggle { pointer-events: none; }
+          .filter-toggle span:first-child { display: none; }
+        }
         @media (max-width: 700px) {
           .rishta-grid { grid-template-columns: 1fr !important; }
+          .rishta-grid aside { position: static !important; top: auto !important; }
         }
       `}</style>
     </div>

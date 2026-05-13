@@ -985,6 +985,7 @@ export default function AdminPage({
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<DbBook | DbArticle | null>(null);
   const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
@@ -1051,29 +1052,55 @@ export default function AdminPage({
         background: A.panel, borderBottom: `1px solid ${A.border}`,
         padding: '0 clamp(16px,3vw,40px)',
         display: 'flex', alignItems: 'center', gap: 16, height: 56,
+        position: 'sticky', top: 0, zIndex: 100,
       }}>
+        <button
+          className="admin-hamburger"
+          onClick={() => setNavOpen(v => !v)}
+          style={{
+            background: 'transparent', border: `1px solid ${A.border}`,
+            color: A.mute, width: 34, height: 34, borderRadius: 6,
+            cursor: 'pointer', fontSize: 16, display: 'none',
+            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}
+        >☰</button>
         <span style={{ fontWeight: 800, fontSize: 16, color: A.accent }}>Meo Qoum</span>
-        <span style={{ color: A.border }}>|</span>
-        <span style={{ fontSize: 13, color: A.mute }}>Admin Panel</span>
+        <span style={{ color: A.border }} className="admin-pipe">|</span>
+        <span style={{ fontSize: 13, color: A.mute }} className="admin-label">Admin Panel</span>
         <div style={{ flex: 1 }} />
-        <a href={`/${locale}`} style={{ color: A.mute, fontSize: 12, textDecoration: 'none' }}>← Back to site</a>
+        <a href={`/${locale}`} style={{ color: A.mute, fontSize: 12, textDecoration: 'none' }}>← Back</a>
       </div>
 
       <div style={{ display: 'flex', minHeight: 'calc(100vh - 56px)' }}>
 
+        {/* Mobile overlay */}
+        {navOpen && (
+          <div
+            onClick={() => setNavOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+              zIndex: 49, display: 'none',
+            }}
+            className="admin-overlay"
+          />
+        )}
+
         {/* Sidebar */}
-        <nav style={{
-          width: 200, background: A.panel,
-          borderInlineEnd: `1px solid ${A.border}`,
-          padding: '24px 0', flexShrink: 0,
-        }}>
+        <nav
+          className={`admin-nav${navOpen ? ' admin-nav-open' : ''}`}
+          style={{
+            width: 200, background: A.panel,
+            borderInlineEnd: `1px solid ${A.border}`,
+            padding: '24px 0', flexShrink: 0,
+          }}
+        >
           {([
             { key: 'books',    label: '📚  Books',    count: books.length },
             { key: 'articles', label: '📰  Articles', count: articles.length },
             { key: 'users',    label: '👥  Members',  count: users.length },
             { key: 'degrees',  label: '🎓  Degrees',  count: degrees.filter(d => d.degree_status === 'pending').length },
           ] as { key: Tab; label: string; count: number }[]).map(item => (
-            <button key={item.key} onClick={() => { setTab(item.key); setShowForm(false); }}
+            <button key={item.key} onClick={() => { setTab(item.key); setShowForm(false); setEditItem(null); setNavOpen(false); }}
               style={{
                 width: '100%', padding: '10px 20px',
                 background: tab === item.key ? `${A.accent}15` : 'transparent',
@@ -1301,6 +1328,29 @@ export default function AdminPage({
           </details>
         </main>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-hamburger { display: flex !important; }
+          .admin-pipe, .admin-label { display: none !important; }
+          .admin-overlay { display: block !important; }
+          .admin-nav {
+            position: fixed !important;
+            top: 56px !important; left: 0 !important; bottom: 0 !important;
+            z-index: 50 !important;
+            transform: translateX(-100%);
+            transition: transform 0.22s ease;
+            width: 220px !important;
+            overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+          }
+          .admin-nav.admin-nav-open { transform: translateX(0) !important; }
+          /* Scrollable form on mobile */
+          main { padding: 16px !important; }
+          table { font-size: 11px !important; }
+          table td, table th { padding: 8px 6px !important; }
+        }
+      `}</style>
 
       {drawerUserId && (
         <UserDrawer

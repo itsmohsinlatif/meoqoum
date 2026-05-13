@@ -577,9 +577,9 @@ export const RISHTA = {
 /* FOOTER */
 export const FOOTER = {
   about: {
-    en: 'Meo Qoum is an open community archive maintained by volunteer editors across Mewat, Karachi, Lahore, and wherever Meos live in the world. Contributions in any of our three languages are welcome.',
-    ur: 'میو قوم ایک کھلا کمیونٹی آرکائیو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار مرتب کرتے ہیں۔ ہماری تینوں زبانوں میں شراکت کا خیر مقدم ہے۔',
-    mew: 'میو قوم ایک کھلو سماج کو خزانو ہے جسے میوات، کراچی، لاہور اور خلیج کے رضاکار سنبھالاں ہاں۔ ہماری تیناں بولیاں میں حصہ ڈالنو خوش آمدید۔',
+    en: 'Meo Qoum is an open community archive maintained by volunteer editors across Mewat, Lahore, and wherever Meos live in the world. Contributions in any of our three languages are welcome.',
+    ur: 'میو قوم ایک کھلا کمیونٹی آرکائیو ہے جسے میوات، لاہور اور دنیا بھر کے رضاکار مرتب کرتے ہیں۔ ہماری تینوں زبانوں میں شراکت کا خیر مقدم ہے۔',
+    mew: 'میو قوم ایک کھلو سماج کو خزانو ہے جسے میوات، لاہور اور دنیا بھر کے رضاکار سنبھالاں ہاں۔ ہماری تیناں بولیاں میں حصہ ڈالنو خوش آمدید۔',
   } as L,
   explore:    { en: 'Explore',    ur: 'دیکھیں',    mew: 'دیکھو' } as L,
   contribute: { en: 'Contribute', ur: 'حصہ ڈالیں', mew: 'حصہ ڈالو' } as L,
@@ -587,7 +587,7 @@ export const FOOTER = {
   contactItems: [
     { en: 'editors@meoqoum.com', ur: 'editors@meoqoum.com', mew: 'editors@meoqoum.com' } as L,
     { en: 'Nuh, Haryana · India',  ur: 'نوح، ہریانہ · ہندوستان', mew: 'نوح، ہریانہ · ہندوستان' } as L,
-    { en: 'Karachi · Pakistan',    ur: 'کراچی · پاکستان',        mew: 'کراچی · پاکستان'       } as L,
+    { en: 'Lahore · Pakistan',    ur: 'لاہور · پاکستان',        mew: 'لاہور · پاکستان'       } as L,
   ],
   contributeItems: [
     { en: 'Submit a family record', ur: 'خاندانی روایت بھیجیں', mew: 'گھر کی روایت بھیجو' } as L,
