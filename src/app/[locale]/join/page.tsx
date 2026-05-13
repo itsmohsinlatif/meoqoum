@@ -170,6 +170,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          locale,
           email:          f.email.trim(),
           password:       f.password,
           firstName:      f.firstName.trim(),
@@ -207,9 +208,7 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
         return;
       }
 
-      /* 3. Auto-login so the user lands in an active session */
-      await getSupabase().auth.signInWithPassword({ email: f.email.trim(), password: f.password });
-
+      /* Email not yet verified — success screen prompts user to check inbox */
       setSuccess(true);
     } catch (err) {
       setErrors({ form: String(err) });
@@ -230,18 +229,36 @@ export default function JoinPage({ params }: { params: Promise<{ locale: string 
           padding: '60px 24px',
           background: 'linear-gradient(180deg, var(--cream) 0%, var(--cream-warm) 100%)',
         }}>
-          <StarKhatim size={48} color="#D4AF37" />
+          <div style={{ fontSize: 48 }}>📧</div>
           <h1 style={{ fontFamily: ffH, fontSize: 'clamp(28px,4vw,40px)', marginTop: 24, marginBottom: 16 }}>
-            {d.successTitle[locale]}
+            {locale === 'en' ? 'Check your inbox!'
+              : locale === 'ur' ? 'اپنی ای میل چیک کریں!'
+              : 'اپنی ای میل چیک کرو!'}
           </h1>
-          <p style={{ fontFamily: ff, fontSize: 16, color: 'var(--ink-soft)', maxWidth: 440, lineHeight: 1.7 }}>
-            {d.successSub[locale]}
+          <p style={{ fontFamily: ff, fontSize: 16, color: 'var(--ink-soft)', maxWidth: 460, lineHeight: 1.7 }}>
+            {locale === 'en'
+              ? 'We sent a verification link to your email address. Click it to confirm your account, then come back to log in.'
+              : locale === 'ur'
+              ? 'ہم نے آپ کی ای میل پر ایک تصدیقی لنک بھیجا ہے۔ اسے کلک کریں، پھر لاگ ان کریں۔'
+              : 'ہم نے تمہاری ای میل پر ایک تصدیقی لنک بھیجو ہے۔ اوکے کلک کرو، پھر لاگ ان کرو۔'}
           </p>
+          <div style={{
+            marginTop: 16, padding: '12px 20px',
+            background: '#fff8e1', border: '1px solid #f0c040',
+            borderRadius: 6, fontSize: 13, fontFamily: ff, color: '#7a5c00',
+          }}>
+            {locale === 'en' ? '💡 Check your spam/junk folder if you don\'t see it within a few minutes.'
+              : locale === 'ur' ? '💡 اگر چند منٹ میں نہ آئے تو اسپام فولڈر چیک کریں۔'
+              : '💡 اگر چند منٹاں میں نہ آئے تو اسپام فولڈر چیک کرو۔'}
+          </div>
           <Link href={`/${locale}/login`} style={{
-            marginTop: 32, display: 'inline-block',
-            background: 'var(--emerald)', color: 'var(--cream)',
-            padding: '12px 28px', textDecoration: 'none',
-            fontFamily: ff, fontWeight: 600,
+            marginTop: 28, display: 'inline-block',
+            background: '#D4AF37', color: '#0f1a0a',
+            padding: '13px 32px', textDecoration: 'none',
+            fontFamily: ff, fontWeight: 800, fontSize: 15,
+            letterSpacing: locale === 'en' ? '0.08em' : 0,
+            textTransform: locale === 'en' ? 'uppercase' : 'none',
+            boxShadow: '0 2px 12px rgba(212,175,55,0.35)',
           }}>
             {locale === 'en' ? 'Go to Login' : locale === 'ur' ? 'لاگ ان پر جائیں' : 'لاگ ان پر جاؤ'}
           </Link>

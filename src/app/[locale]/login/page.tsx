@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
@@ -15,29 +15,47 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
   if (!routing.locales.includes(rawLocale as (typeof routing.locales)[number])) notFound();
   const locale = rawLocale as Locale;
 
-  const router = useRouter();
+  const router      = useRouter();
+  const searchParams = useSearchParams();
+  const verified     = searchParams.get('verified') === '1';
   const dir = locale === 'en' ? 'ltr' : 'rtl';
   const ff  = locale === 'en' ? 'var(--sans)' : 'var(--urdu)';
   const ffH = locale === 'en' ? 'var(--serif)' : 'var(--urdu)';
   const d   = LOGIN;
 
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [email,         setEmail]         = useState('');
+  const [password,      setPassword]      = useState('');
+  const [error,         setError]         = useState('');
+  const [loading,       setLoading]       = useState(false);
+  const [unconfirmed,   setUnconfirmed]   = useState(false);
+  const [resendSent,    setResendSent]    = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setError(''); setUnconfirmed(false);
     setLoading(true);
     try {
       const sb = getSupabase();
       const { error: err } = await sb.auth.signInWithPassword({ email, password });
-      if (err) { setError(d.errorMsg[locale]); return; }
+      if (err) {
+        if (err.message.toLowerCase().includes('email not confirmed')) {
+          setUnconfirmed(true);
+        } else {
+          setError(d.errorMsg[locale]);
+        }
+        return;
+      }
       router.push(`/${locale}/rishta`);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function resendVerification() {
+    if (!email) { setError(locale === 'en' ? 'Enter your email first.' : 'پہلے ای میل لکھیں۔'); return; }
+    const sb = getSupabase();
+    await sb.auth.resend({ type: 'signup', email });
+    setResendSent(true);
   }
 
   return (
@@ -51,6 +69,22 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
         padding: 'clamp(40px,6vw,80px) clamp(20px,5vw,40px)',
       }}>
         <div style={{ width: '100%', maxWidth: 460 }}>
+          {/* Email verified banner */}
+          {verified && (
+            <div style={{
+              background: '#004225', color: '#d4f5e0',
+              padding: '12px 16px', borderRadius: 6, marginBottom: 24,
+              fontSize: 14, fontFamily: ff, display: 'flex', gap: 10, alignItems: 'center',
+            }}>
+              <span style={{ fontSize: 18 }}>✓</span>
+              <span>
+                {locale === 'en' ? 'Email verified! You can now log in.'
+                  : locale === 'ur' ? 'ای میل تصدیق ہو گئی! اب لاگ ان کریں۔'
+                  : 'ای میل تصدیق ہو گئی! اب لاگ ان کرو۔'}
+              </span>
+            </div>
+          )}
+
           <span className="mp-eyebrow" style={{ fontFamily: ff, display: 'block', marginBottom: 12 }}>
             {d.eyebrow[locale]}
           </span>
@@ -86,16 +120,54 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
               <p style={{ color: '#c0392b', fontFamily: ff, fontSize: 13 }}>{error}</p>
             )}
 
+            {/* Unconfirmed email warning */}
+            {unconfirmed && (
+              <div style={{
+                background: '#fff8e1', border: '1px solid #f0c040',
+                borderRadius: 6, padding: '12px 16px', fontSize: 13, fontFamily: ff,
+              }}>
+                <p style={{ margin: '0 0 8px', color: '#7a5c00', fontWeight: 600 }}>
+                  {locale === 'en' ? 'Email not verified yet.'
+                    : locale === 'ur' ? 'ای میل ابھی تصدیق نہیں ہوئی۔'
+                    : 'ای میل ابھی تصدیق نہیں ہوئی۔'}
+                </p>
+                {resendSent ? (
+                  <p style={{ margin: 0, color: '#2e7d32' }}>
+                    {locale === 'en' ? '✓ Verification email resent — check your inbox.'
+                      : locale === 'ur' ? '✓ تصدیقی ای میل دوبارہ بھیج دی گئی۔'
+                      : '✓ تصدیقی ای میل دوبارہ بھیج دی گئی۔'}
+                  </p>
+                ) : (
+                  <button type="button" onClick={resendVerification}
+                    style={{
+                      background: 'transparent', border: 0, padding: 0,
+                      color: '#004225', fontWeight: 700, cursor: 'pointer',
+                      fontFamily: ff, fontSize: 13, textDecoration: 'underline',
+                    }}>
+                    {locale === 'en' ? 'Resend verification email →'
+                      : locale === 'ur' ? 'تصدیقی ای میل دوبارہ بھیجیں →'
+                      : 'تصدیقی ای میل دوبارہ بھیجو →'}
+                  </button>
+                )}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
               style={{
-                background: 'var(--emerald)', color: 'var(--cream)',
-                border: 0, padding: '14px 28px', cursor: loading ? 'wait' : 'pointer',
-                fontFamily: ff, fontSize: 15, fontWeight: 600,
-                letterSpacing: locale === 'en' ? '0.08em' : 0,
+                background: '#D4AF37',
+                color: '#0f1a0a',
+                border: 0,
+                padding: '15px 28px',
+                cursor: loading ? 'wait' : 'pointer',
+                fontFamily: ff, fontSize: 15, fontWeight: 800,
+                letterSpacing: locale === 'en' ? '0.1em' : 0,
                 textTransform: locale === 'en' ? 'uppercase' : 'none',
-                opacity: loading ? 0.7 : 1, marginTop: 4,
+                opacity: loading ? 0.7 : 1,
+                marginTop: 4,
+                boxShadow: '0 2px 12px rgba(212,175,55,0.4)',
+                transition: 'opacity 0.15s',
               }}
             >
               {loading ? '…' : d.loginBtn[locale]}
